@@ -2,22 +2,11 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 
 
-class Message(models.Model):
-    sender = models.ForeignKey(User, on_delete=models.CASCADE)
-    group = models.ForeignKey(Group, on_delete=models.CASCADE)
-    text = models.TextField()
-    created_at = models.DateTimeField(auto_add_now=True)
-
-    def __str__(self):
-        return f"{self.sender.username} ({self.group.name}): {self.text}"
-
-
 class Group(models.Model):
     name = models.CharField(max_length=255)
 
     def __str__(self):
         return self.name
-
 
 class UserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
@@ -58,3 +47,21 @@ class User(AbstractBaseUser, PermissionsMixin):
     @property
     def group_list(self):
         return [group.name for group in self.groups.all()]
+
+
+class Conversation(models.Model):
+    book_title = models.CharField(max_length=255)
+    group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name='conversations')
+
+    def __str__(self):
+        return self.book_title
+
+
+class Message(models.Model):
+    sender = models.ForeignKey(User, on_delete=models.CASCADE)
+    conversation = models.ForeignKey(Conversation, on_delete=models.CASCADE)
+    text = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.sender.username} ({self.group.name}): {self.text}"
