@@ -25,5 +25,5 @@ class ConversationSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class UserSerializer(serializer.ModelSerializer):
+class UserSerializer(serializers.ModelSerializer):
     pass
