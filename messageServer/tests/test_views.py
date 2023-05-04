@@ -13,7 +13,6 @@ class SendMessageTest(APITestCase):
         group = Group.objects.create(name='test group')
         user = User.objects.create(email="chondosha@example.com", name="chondosha")
         conversation = Conversation.objects.create(book_title='test conversation', group=group)
-        #user_data = UserSerializer(user).data
         data = {
             'sender': user.id,
             'conversation': conversation.id,
@@ -28,17 +27,20 @@ class SendMessageTest(APITestCase):
         self.assertEqual(Message.objects.get().conversation, conversation)
 
 
-"""
+
 class GetMessagesTests(APITestCase):
 
     def test_get_messages(self):
         group = Group.objects.create(name='test group')
-        message1 = Message.objects.create(group=group, text='test message 1')
-        message2 = Message.objects.create(group=group, text='test message 2')
+        user = User.objects.create(email="chondosha@example.com", name="chondosha")
+        conversation = Conversation.objects.create(book_title='test conversation', group=group)
+        message1 = Message.objects.create(sender=user, conversation=conversation, text='test message 1')
+        message2 = Message.objects.create(sender=user, conversation=conversation, text='test message 2')
+
         url = reverse('get_messages', args=[group.id])
         response = self.client.get(url, format='json')
+
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 2)
         self.assertEqual(response.data[0]['text'], message1.text)
         self.assertEqual(response.data[1]['text'], message2.text)
-"""
