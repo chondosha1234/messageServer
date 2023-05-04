@@ -2,7 +2,7 @@ from rest_framework import generics, status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.view import APIView
+from rest_framework.views import APIView
 from .models import Message, Group, Conversation
 from .serializers import MessageSerializer, GroupSerializer, ConversationSerializer, UserSerializer
 from django.contrib.auth import get_user_model
@@ -56,11 +56,29 @@ def get_group_list(request, user_id):
     try:
         user = User.objects.get(id=user_id)
     except User.DoesNotExist:
-        return Response({'error': 'User does not exist'}, status = 404)
+        return Response({'error': 'User does not exist'}, status=status.HTTP_404_NOT_FOUND)
 
     groups = user.groups
     serializer = GroupSerializer(groups, many=True)
     return Response(serializer.data)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_member_list(request, group_id):
+    pass
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def add_member(request, group_id, user_id):
+    pass
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def remove_member(request, group_id, user_id):
+    pass
 
 
 """
@@ -79,7 +97,7 @@ def get_conversation_list(request, group_id):
     try:
         group = Group.objects.get(id=group_id)
     except Group.DoesNotExist:
-        return Response({'error': 'Group does not exist'}, status = 404)
+        return Response({'error': 'Group does not exist'}, status=status.HTTP_404_NOT_FOUND)
 
     conversations = group.conversations.all()
     serialize = ConversationSerializer(conversations, many=True)
@@ -92,7 +110,36 @@ API views related to Users and friends
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
-def add_friend(request):
+def add_friend(request, user_id):
+    try:
+        friend = User.objects.get(id=user_id)
+        user = request.user
+        user.friends.add(friend)
+        user_serializer = UserSerializer(user)
+        return Response(user_serializer.data, status=status.HTTP_200_OK)
+    except User.DoesNotExist:
+        return Response({'error': 'User does not exist'}, status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def remove_friend(request, user_id):
+    try:
+        friend = User.objects.get(id=user_id)
+        user = request.user
+        if friend in user.friends.all():
+            user.friends.remove(friend)
+            user_serializer = UserSerializer(user)
+            return Response(user_serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response({'error': f'{friend.name} is not in friends list'}, status=status.HTTP_400_BAD_REQUEST)
+    except User.DoesNotExist:
+        return Response({'error': 'User does not exist'}, status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_friends_list(request):
     pass
 
 

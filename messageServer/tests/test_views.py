@@ -37,10 +37,26 @@ class GetMessagesTests(APITestCase):
         message1 = Message.objects.create(sender=user, conversation=conversation, text='test message 1')
         message2 = Message.objects.create(sender=user, conversation=conversation, text='test message 2')
 
-        url = reverse('get_messages', args=[group.id])
+        url = reverse('get_messages', args=[conversation.id])
         response = self.client.get(url, format='json')
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 2)
         self.assertEqual(response.data[0]['text'], message1.text)
         self.assertEqual(response.data[1]['text'], message2.text)
+
+
+class FriendsListTest(APITestCase):
+
+    def test_add_friend(self):
+        user = User.objects.create(email="chondosha@example.com", name="chondosha")
+        friend = User.objects.create(email="friend@example.com", name="friend_guy")
+
+        self.assertEqual(user.friends.all().count(), 0)
+
+        url = reverse('add_friend', args=[friend.id])
+        response = self.client.post(url, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(user.friends.all().count(), 1)
+        self.assertEqual(response.data[0], friend)

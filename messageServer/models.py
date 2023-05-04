@@ -36,6 +36,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     groups = models.ManyToManyField(Group, related_name='members')
+    friends = models.ManyToManyField('self', blank=True)
 
     USERNAME_FIELD = 'email'
 
