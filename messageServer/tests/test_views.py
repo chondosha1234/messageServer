@@ -1,24 +1,31 @@
 from django.urls import reverse
+from django.contrib.auth import get_user_model
 from rest_framework import status
 from rest_framework.test import APITestCase
-from messageServer.models import Message, Group
-from messageServer.serializers import MessageSerializer, GroupSerializer
+from messageServer.models import Message, Group, Conversation
+from messageServer.serializers import MessageSerializer, GroupSerializer, UserSerializer
+
+User = get_user_model()
 
 class SendMessageTest(APITestCase):
 
     def test_send_message(self):
         group = Group.objects.create(name='test group')
+        user = User.objects.create(email="chondosha@example.com", name="chondosha")
+        conversation = Conversation.objects.create(book_title='test conversation', group=group)
+        #user_data = UserSerializer(user).data
         data = {
-            'group': group.id,
+            'sender': user.id,
+            'conversation': conversation.id,
             'text': 'test message'
         }
         url = reverse('send_message')
-        response = self.client.post(url, data, format='json')
-        print(response)
+        response = self.client.post(url, data=data, format='json')
+
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(Message.objects.count(), 1)
         self.assertEqual(Message.objects.get().text, 'test message')
-        self.assertEqual(Message.objects.get().group, group)
+        self.assertEqual(Message.objects.get().conversation, conversation)
 
 
 """

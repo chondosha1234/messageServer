@@ -4,10 +4,21 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from .models import Message, Group, Conversation
 from .serializers import MessageSerializer, GroupSerializer, ConversationSerializer
+from django.contrib.auth import get_user_model
 
+User = get_user_model()
 
 @api_view(['POST'])
 def send_message(request):
+    sender_id = request.data.get('sender')
+    try:
+        sender = User.objects.get(id=sender_id)
+    except User.DoesNotExist:
+        return Response({'sender': f'User with id {sender_id} does not exist'})
+
+    data = request.data.copy()
+    data['sender'] = sender
+
     serializer = MessageSerializer(data=request.data)
     if serializer.is_valid():
         serializer.save()

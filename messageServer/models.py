@@ -64,4 +64,4 @@ class Message(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.sender.username} ({self.group.name}): {self.text}"
+        return f"{self.sender.name} ({self.group.name}): {self.text}"
