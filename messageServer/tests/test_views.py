@@ -7,17 +7,21 @@ from messageServer.serializers import MessageSerializer, GroupSerializer, UserSe
 
 User = get_user_model()
 
+
 class SendMessageTest(APITestCase):
 
     def test_send_message(self):
         group = Group.objects.create(name='test group')
         user = User.objects.create(email="chondosha@example.com", name="chondosha")
+        self.client.force_authenticate(user=user)
+
         conversation = Conversation.objects.create(book_title='test conversation', group=group)
         data = {
             'sender': user.id,
             'conversation': conversation.id,
             'text': 'test message'
         }
+
         url = reverse('send_message')
         response = self.client.post(url, data=data, format='json')
 
@@ -27,12 +31,13 @@ class SendMessageTest(APITestCase):
         self.assertEqual(Message.objects.get().conversation, conversation)
 
 
-
 class GetMessagesTests(APITestCase):
 
     def test_get_messages(self):
         group = Group.objects.create(name='test group')
         user = User.objects.create(email="chondosha@example.com", name="chondosha")
+        self.client.force_authenticate(user=user)
+
         conversation = Conversation.objects.create(book_title='test conversation', group=group)
         message1 = Message.objects.create(sender=user, conversation=conversation, text='test message 1')
         message2 = Message.objects.create(sender=user, conversation=conversation, text='test message 2')
@@ -49,8 +54,9 @@ class GetMessagesTests(APITestCase):
 class FriendsListTest(APITestCase):
 
     def test_add_friend(self):
-        user = User.objects.create(email="chondosha@example.com", name="chondosha")
+        user = User.objects.create(email="chondosha@example.com", name="chondosha", password="chondosha5563")
         friend = User.objects.create(email="friend@example.com", name="friend_guy")
+        self.client.force_authenticate(user=user)
 
         self.assertEqual(user.friends.all().count(), 0)
 
@@ -59,4 +65,69 @@ class FriendsListTest(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(user.friends.all().count(), 1)
-        self.assertEqual(response.data[0], friend)
+        self.assertEqual(user.friends.first(), friend)
+
+    def test_remove_friends(self):
+        user = User.objects.create(email="chondosha@example.com", name="chondosha", password="chondosha5563")
+        friend = User.objects.create(email="friend@example.com", name="friend_guy")
+        user.friends.add(friend)
+        user.save()
+        self.client.force_authenticate(user=user)
+
+        self.assertEqual(user.friends.all().count(), 1)
+        self.assertEqual(user.friends.first(), friend)
+
+        url = reverse('remove_friend', args=[friend.id])
+        response = self.client.post(url, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(user.friends.all().count(), 0)
+
+    def test_get_friends_list(self):
+        user = User.objects.create(email="chondosha@example.com", name="chondosha", password="chondosha5563")
+        friend1 = User.objects.create(email="friend@example.com", name="friend_guy")
+        friend2 = User.objects.create(email="friend2@example.com", name="friend2_guy")
+        user.friends.add(friend1)
+        user.friends.add(friend2)
+        user.save()
+        self.client.force_authenticate(user=user)
+
+        self.assertEqual(user.friends.all().count(), 2)
+
+        url = reverse('get_friends_list')
+        response = self.client.get(url, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data[0]['email'], friend1.email)
+        self.assertEqual(response.data[1]['email'], friend2.email)
+
+    def test_get_friends_list_returns_empty_list(self):
+        user = User.objects.create(email="chondosha@example.com", name="chondosha", password="chondosha5563")
+        self.client.force_authenticate(user=user)
+
+        self.assertEqual(user.friends.all().count(), 0)
+
+        url = reverse('get_friends_list')
+        response = self.client.get(url, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, [])
+
+
+class GroupTests(APITestCase):
+
+    def test_create_group(self):
+        user = User.objects.create(email="chondosha@example.com", name="chondosha")
+        self.client.force_authenticate(user=user)
+
+        self.assertEqual(Group.objects.count(), 0)
+
+        data = {
+            'name': 'test group'
+        }
+        url = reverse('create_group')
+        response = self.client.post(url, data=data, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(Group.objects.count(), 1)
+        self.assertEqual(Group.objects.first().name, 'test group')

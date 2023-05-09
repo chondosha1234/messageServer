@@ -42,6 +42,16 @@ INSTALLED_APPS = [
 ]
 
 AUTH_USER_MODEL = 'messageServer.User'
+AUTHENTICATION_BACKENDS = [
+    'messageServer.authentication.CustomAuthenticationBackend',
+]
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'messageServer.authentication.CustomAuthenticationBackend',
+        'rest_framework.authentication.SessionAuthentication',
+    ]
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

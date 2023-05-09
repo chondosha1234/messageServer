@@ -37,7 +37,7 @@ def send_message(request):
 def get_messages(request, conversation_id):
     messages = Message.objects.filter(conversation=conversation_id)
     serializer = MessageSerializer(messages, many=True)
-    return Response(serializer.data)
+    return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 """
@@ -47,7 +47,11 @@ API views related to Groups
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_group(request):
-    pass
+    serializer = GroupSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['GET'])
@@ -100,8 +104,8 @@ def get_conversation_list(request, group_id):
         return Response({'error': 'Group does not exist'}, status=status.HTTP_404_NOT_FOUND)
 
     conversations = group.conversations.all()
-    serialize = ConversationSerializer(conversations, many=True)
-    return Response(serializer.data)
+    serializer = ConversationSerializer(conversations, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 """
@@ -140,7 +144,15 @@ def remove_friend(request, user_id):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_friends_list(request):
-    pass
+    user = request.user
+    friends = user.friends.all()
+
+    if friends is not None:
+        serializer = UserSerializer(friends, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    else:
+        return Response({'detail': 'An error occurred while checking the friends list'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 
 class CreateUserView(generics.CreateAPIView):
@@ -155,12 +167,11 @@ def get_user(request):
 class LoginView(APIView):
 
     def post(self, request):
-        email = request.data.get('email')
+        name = request.data.get('name')
         password = request.data.get('password')
-        user = authenticate(request, email=email, password=password)
+        user = authenticate(name=name, password=password)
         if user is not None:
             login(request, user)
-            # maybe change from 'detail' to something else like home
             return Response({'detail': 'Logged in successfully'})
         else:
             return Response({'detail': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)

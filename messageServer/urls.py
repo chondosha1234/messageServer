@@ -9,5 +9,6 @@ urlpatterns = [
     path('groups/conversations/create', views.create_conversation, name='create_conversation'),
     path('users/<int:group_id>/conversations', views.get_conversation_list, name='get_conversation_list'),
     path('users/<int:user_id>/add_friend', views.add_friend, name='add_friend'),
-    path('users/<int:user_id>/remove_friend', views.remove_friend, name='remove_friend')
+    path('users/<int:user_id>/remove_friend', views.remove_friend, name='remove_friend'),
+    path('users/get_friends_list', views.get_friends_list, name='get_friends_list')
 ]
