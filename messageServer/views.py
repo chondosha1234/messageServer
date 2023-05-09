@@ -197,6 +197,7 @@ def get_friends_list(request):
 
 class CreateUserView(generics.CreateAPIView):
     serializer_class = UserSerializer
+    authentication_classes = []
 
 
 @api_view(['GET'])

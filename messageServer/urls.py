@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
+from messageServer.views import CreateUserView
 
 urlpatterns = [
     path('messages/send/', views.send_message, name='send_message'),
@@ -14,5 +15,6 @@ urlpatterns = [
     path('users/<int:user_id>/add_friend', views.add_friend, name='add_friend'),
     path('users/<int:user_id>/remove_friend', views.remove_friend, name='remove_friend'),
     path('users/get_friends_list', views.get_friends_list, name='get_friends_list'),
+    path('users/create_user', CreateUserView.as_view(), name='create_user')
 
 ]

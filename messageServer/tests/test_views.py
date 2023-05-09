@@ -51,7 +51,19 @@ class MessageTests(APITestCase):
 class UserTests(APITestCase):
 
     def test_create_user(self):
-        pass
+        self.assertEqual(User.objects.count(), 0)
+
+        data = {
+            'email': 'chondosha@example.org',
+            'name': 'chondosha',
+            'password': 'chondosha5563'
+        }
+        url = reverse('create_user')
+        response = self.client.post(url, data, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(User.objects.count(), 1)
+        self.assertEqual(response.data['name'], 'chondosha')
 
     def test_login_and_logout(self):
         pass
