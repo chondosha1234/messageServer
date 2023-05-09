@@ -64,13 +64,20 @@ def get_group_list(request, user_id):
 
     groups = user.groups
     serializer = GroupSerializer(groups, many=True)
-    return Response(serializer.data)
+    return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_member_list(request, group_id):
-    pass
+    try:
+        group = Group.objects.get(id=group_id)
+    except Group.DoesnotExist:
+        return Response({'error': 'Group does not exist'}, status=status.HTTP_404_NOT_FOUND)
+
+    members = group.members.all()
+    serializer = UserSerializer(members, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 @api_view(['POST'])
@@ -92,7 +99,11 @@ API views related to Conversations
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_conversation(request):
-    pass
+    serializer = ConversationSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['GET'])
@@ -152,7 +163,6 @@ def get_friends_list(request):
         return Response(serializer.data, status=status.HTTP_200_OK)
     else:
         return Response({'detail': 'An error occurred while checking the friends list'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
 
 
 class CreateUserView(generics.CreateAPIView):

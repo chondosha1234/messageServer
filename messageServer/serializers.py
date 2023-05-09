@@ -45,3 +45,14 @@ class ConversationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Conversation
         fields = '__all__'
+
+    def create(self, validated_data):
+        book_title = validated_data.pop('book_title')
+        group = validated_data.pop('group')
+
+        conversation = Conversation.objects.create(
+            book_title=book_title,
+            group=group
+        )
+
+        return conversation
