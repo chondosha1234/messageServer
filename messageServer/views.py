@@ -83,13 +83,43 @@ def get_member_list(request, group_id):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def add_member(request, group_id, user_id):
-    pass
+    try:
+        group = Group.objects.get(id=group_id)
+    except Group.DoesNotExist:
+        return Response({'error': 'Group does not exist'}, status=status.HTTP_404_NOT_FOUND)
+
+    try:
+        member = User.objects.get(id=user_id)
+    except User.DoesNotExist:
+        return Response({'error': 'User does not exist'}, status=status.HTTP_404_NOT_FOUND)
+
+    if member not in group.members.all():
+        group.members.add(member)
+        serializer = GroupSerializer(group)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    else:
+        return Response({'error': 'User already in group'}, status=status.HTTP_200_OK)
 
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def remove_member(request, group_id, user_id):
-    pass
+    try:
+        group = Group.objects.get(id=group_id)
+    except Group.DoesNotExist:
+        return Response({'error': 'Group does not exist'}, status=status.HTTP_404_NOT_FOUND)
+
+    try:
+        member = User.objects.get(id=user_id)
+    except User.DoesNotExist:
+        return Response({'error': 'User does not exist'}, status=status.HTTP_404_NOT_FOUND)
+
+    if member in group.members.all():
+        group.members.remove(member)
+        serializer = GroupSerializer(group)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    else:
+        return Response({'error': 'User not in group'}, status=status.HTTP_404_NOT_FOUND)
 
 
 """
