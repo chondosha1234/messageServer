@@ -15,13 +15,13 @@ class AuthenticateTest(TestCase):
 
     def test_returns_existing_user_with_correct_password(self):
         request = HttpRequest()
-        name = "chondosha"
+        username = "chondosha"
         email = "user1234@example.org"
         password = "chondosha5563"
-        expected_user = User.objects.create(name=name, email=email, password=password)
+        expected_user = User.objects.create(username=username, email=email, password=password)
         expected_user.set_password(expected_user.password)
         expected_user.save()
-        user = CustomAuthenticationBackend().authenticate(request, name, password)
+        user = CustomAuthenticationBackend().authenticate(request, username, password)
         self.assertEqual(expected_user, user)
 
     def test_returns_None_for_existing_user_but_wrong_password(self):
@@ -37,7 +37,7 @@ class AuthenticateTest(TestCase):
 class GetUserTest(TestCase):
 
     def test_gets_user_by_name(self):
-        User.objects.create(name="chondosha", email="user1234@example.org", password="chondosha5563")
+        User.objects.create(username="chondosha", email="user1234@example.org", password="chondosha5563")
         desired_user = User.objects.get(email="user1234@example.org")
         found_user = CustomAuthenticationBackend().get_user('chondosha')
         self.assertEqual(found_user, desired_user)

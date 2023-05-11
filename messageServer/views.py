@@ -4,7 +4,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from .models import Message, Group, Conversation
-from .serializers import MessageSerializer, GroupSerializer, ConversationSerializer, UserSerializer
+from .serializers import MessageSerializer, GroupSerializer, ConversationSerializer, UserSerializer, LoginSerializer
 from django.contrib.auth import get_user_model
 from django.contrib.auth import authenticate, login, logout
 
@@ -56,12 +56,8 @@ def create_group(request):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def get_group_list(request, user_id):
-    try:
-        user = User.objects.get(id=user_id)
-    except User.DoesNotExist:
-        return Response({'error': 'User does not exist'}, status=status.HTTP_404_NOT_FOUND)
-
+def get_group_list(request):
+    user = request.user
     groups = user.groups
     serializer = GroupSerializer(groups, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
@@ -128,7 +124,7 @@ API views related to Conversations
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
-def create_conversation(request):
+def create_conversation(request, group_id):
     serializer = ConversationSerializer(data=request.data)
     if serializer.is_valid():
         serializer.save()
@@ -177,7 +173,7 @@ def remove_friend(request, user_id):
             user_serializer = UserSerializer(user)
             return Response(user_serializer.data, status=status.HTTP_200_OK)
         else:
-            return Response({'error': f'{friend.name} is not in friends list'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': f'{friend.username} is not in friends list'}, status=status.HTTP_400_BAD_REQUEST)
     except User.DoesNotExist:
         return Response({'error': 'User does not exist'}, status=status.HTTP_404_NOT_FOUND)
 
@@ -201,19 +197,32 @@ class CreateUserView(generics.CreateAPIView):
 
 
 @api_view(['GET'])
-def get_user(request):
-    pass
+def get_user(request, user_id):
+    try:
+        friend = User.objects.get(id=user_id)
+        user = request.user
+        user.friends.add(friend)
+        user_serializer = UserSerializer(user)
+        return Response(user_serializer.data, status=status.HTTP_200_OK)
+    except User.DoesNotExist:
+        return Response({'error': 'User does not exist'}, status=status.HTTP_404_NOT_FOUND)
 
 
 class LoginView(APIView):
+    authentication_classes = []
 
     def post(self, request):
-        name = request.data.get('name')
-        password = request.data.get('password')
-        user = authenticate(name=name, password=password)
+        serializer = LoginSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        username = serializer.validated_data['username']
+        password = serializer.validated_data['password']
+
+        user = authenticate(username=username, password=password)
         if user is not None:
             login(request, user)
-            return Response({'detail': 'Logged in successfully'})
+            user_serializer = UserSerializer(user)
+            return Response(user_serializer.data, status=status.HTTP_200_OK)
         else:
             return Response({'detail': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
 

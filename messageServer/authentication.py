@@ -3,9 +3,9 @@ from django.contrib.auth.backends import ModelBackend
 
 class CustomAuthenticationBackend(object):
 
-    def authenticate(self, request, name, password):
+    def authenticate(self, request, username, password):
         try:
-            user = User.objects.get(name=name)
+            user = User.objects.get(username=username)
             if user.check_password(password):
                 return user
             else:
@@ -13,8 +13,8 @@ class CustomAuthenticationBackend(object):
         except User.DoesNotExist:
             return None
 
-    def get_user(self, name):
+    def get_user(self, username):
         try:
-            return User.objects.get(name=name)
+            return User.objects.get(username=username)
         except User.DoesNotExist:
             return None

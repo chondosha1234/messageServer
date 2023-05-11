@@ -37,18 +37,18 @@ class UserManager(BaseUserManager):
 
 class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True)
-    name = models.CharField(max_length=255, unique=True, blank=True)
+    username = models.CharField(max_length=255, unique=True, blank=True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     groups = models.ManyToManyField(Group, related_name='members')
     friends = models.ManyToManyField('self', blank=True)
 
-    USERNAME_FIELD = 'name'
+    USERNAME_FIELD = 'username'
 
     objects = UserManager()
 
     def __str__(self):
-        return self.name
+        return self.username
 
     @property
     def group_list(self):
