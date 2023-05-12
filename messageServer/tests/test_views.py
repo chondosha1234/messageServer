@@ -96,6 +96,9 @@ class UserTests(APITestCase):
     def test_get_current_user(self):
         user = User.objects.create(email="chondosha@example.com", username="chondosha")
         self.client.force_authenticate(user=user)
+        group = Group.objects.create(name='test group')
+        group.members.add(user)
+        group.save()
 
         url = reverse('get_current_user')
         response = self.client.get(url, format='json')
@@ -151,8 +154,8 @@ class FriendsListTests(APITestCase):
         response = self.client.get(url, format='json')
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data[0]['email'], friend1.email)
-        self.assertEqual(response.data[1]['email'], friend2.email)
+        response_emails = [friend['email'] for friend in response.data]
+        self.assertCountEqual(response_emails, [friend1.email, friend2.email])
 
     def test_get_friends_list_returns_empty_list(self):
         user = User.objects.create(email="chondosha@example.com", username="chondosha", password="chondosha5563")
@@ -210,8 +213,8 @@ class GroupTests(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 2)
-        self.assertEqual(response.data[0]['name'], group1.name)
-        self.assertEqual(response.data[1]['name'], group2.name)
+        response_group_names = [group['name'] for group in response.data]
+        self.assertCountEqual(response_group_names, [group1.name, group2.name])
 
     def test_get_member_list(self):
         user = User.objects.create(email="chondosha@example.com", username="chondosha")
@@ -245,8 +248,8 @@ class GroupTests(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(group.members.all().count(), 2)
-        self.assertEqual(group.members.first().username, user.username)
-        self.assertEqual(group.members.last().username, friend.username)
+        self.assertIn(user, group.members.all())
+        self.assertIn(friend, group.members.all())
 
     def test_remove_member(self):
         user = User.objects.create(email="chondosha@example.com", username="chondosha", password="chondosha5563")
