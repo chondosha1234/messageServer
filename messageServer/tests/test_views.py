@@ -65,7 +65,7 @@ class UserTests(APITestCase):
         self.assertEqual(User.objects.count(), 1)
         self.assertEqual(response.data['username'], 'chondosha')
         self.assertEqual(response.data['email'], 'chondosha@example.org')
-        
+
 
     def test_login_successful(self):
         user = User.objects.create(email="chondosha@example.com", username="chondosha")
@@ -184,6 +184,17 @@ class GroupTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(Group.objects.count(), 1)
         self.assertEqual(Group.objects.first().name, 'test group')
+
+    def test_get_group(self):
+        user = User.objects.create(email="chondosha@example.com", username="chondosha")
+        self.client.force_authenticate(user=user)
+        group = Group.objects.create(name='test group')
+
+        url = reverse('get_group', args=[group.id])
+        response = self.client.get(url, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['name'], group.name)
 
     def test_get_group_list(self):
         user = User.objects.create(email="chondosha@example.com", username="chondosha")

@@ -56,6 +56,17 @@ def create_group(request):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
+def get_group(request, group_id):
+    try:
+        group = Group.objects.get(id=group_id)
+        serializer = GroupSerializer(group)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    except GroupDoesNotExist:
+        return Response({'error': 'Group does not exist'}, status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def get_group_list(request):
     user = request.user
     groups = user.groups

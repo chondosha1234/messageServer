@@ -6,6 +6,7 @@ urlpatterns = [
     path('messages/send/', views.send_message, name='send_message'),
     path('messages/<int:conversation_id>', views.get_messages, name='get_messages'),
     path('groups/create', views.create_group, name='create_group'),
+    path('groups/<int:group_id>/get_group', views.get_group, name='get_group'),
     path('groups/<int:group_id>/get_member_list', views.get_member_list, name='get_member_list'),
     path('groups/<int:group_id>/<int:user_id>/add_member', views.add_member, name='add_member'),
     path('groups/<int:group_id>/<int:user_id>/remove_member', views.remove_member, name='remove_member'),

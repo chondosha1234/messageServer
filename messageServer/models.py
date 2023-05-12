@@ -60,6 +60,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 class Conversation(models.Model):
     book_title = models.CharField(max_length=255)
     group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name='conversations')
+    picture = models.ImageField(upload_to='conversation_pictures', null=True, blank=True)
 
     def __str__(self):
         return self.book_title
