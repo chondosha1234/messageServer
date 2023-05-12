@@ -219,6 +219,12 @@ def get_current_user(request):
         return Response({'error': 'User does not exist'}, status=status.HTTP_404_NOT_FOUND)
 
 
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def add_profile_picture(request):
+    pass
+
+
 class LoginView(APIView):
     authentication_classes = []
 

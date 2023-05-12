@@ -64,6 +64,8 @@ class UserTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(User.objects.count(), 1)
         self.assertEqual(response.data['username'], 'chondosha')
+        self.assertEqual(response.data['email'], 'chondosha@example.org')
+        
 
     def test_login_successful(self):
         user = User.objects.create(email="chondosha@example.com", username="chondosha")

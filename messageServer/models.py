@@ -4,6 +4,7 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, Permis
 
 class Group(models.Model):
     name = models.CharField(max_length=255)
+    picture = models.ImageField(upload_to='group_pictures', null=True, blank=True)
 
     def __str__(self):
         return self.name
@@ -42,6 +43,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(default=False)
     groups = models.ManyToManyField(Group, related_name='members')
     friends = models.ManyToManyField('self', blank=True)
+    picture = models.ImageField(upload_to='user_profiles', null=True, blank=True)
 
     USERNAME_FIELD = 'username'
 
