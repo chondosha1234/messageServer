@@ -16,6 +16,7 @@ urlpatterns = [
     path('users/<int:user_id>/remove_friend', views.remove_friend, name='remove_friend'),
     path('users/get_friends_list', views.get_friends_list, name='get_friends_list'),
     path('users/create_user', CreateUserView.as_view(), name='create_user'),
+    path('users/get_current_user', views.get_current_user, name='get_current_user'),
     path('login', LoginView.as_view(), name='login'),
     path('logout', LogoutView.as_view(), name='logout')
 ]

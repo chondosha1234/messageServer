@@ -208,6 +208,17 @@ def get_user(request, user_id):
         return Response({'error': 'User does not exist'}, status=status.HTTP_404_NOT_FOUND)
 
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_current_user(request):
+    user = request.user
+    if user:
+        serializer = UserSerializer(user)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    else:
+        return Response({'error': 'User does not exist'}, status=status.HTTP_404_NOT_FOUND)
+
+
 class LoginView(APIView):
     authentication_classes = []
 

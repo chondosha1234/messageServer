@@ -81,7 +81,6 @@ class UserTests(APITestCase):
         self.assertEqual(response.data['username'], 'chondosha')
 
     def test_login_invalid_credentials(self):
-
         data = {
             'username': 'invalid_user',
             'password': 'invalid_password'
@@ -91,6 +90,16 @@ class UserTests(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
         self.assertEqual(response.data['detail'], 'Invalid credentials')
+
+    def test_get_current_user(self):
+        user = User.objects.create(email="chondosha@example.com", username="chondosha")
+        self.client.force_authenticate(user=user)
+
+        url = reverse('get_current_user')
+        response = self.client.get(url, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['username'], 'chondosha')
 
 
 class FriendsListTests(APITestCase):
