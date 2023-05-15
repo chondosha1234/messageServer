@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 import os
+import firebase_admin
+from firebase_admin import credentials
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -21,13 +23,24 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-oo7se-1kit&2io$z@l$@13o@47ls-i0$0h8)7^*jdl@lcx%&y&'
-
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
 
-ALLOWED_HOSTS = []
 
+if 'DJANGO_DEBUG_FALSE' in os.environ:
+    DEBUG = False
+    SECRET_KEY = os.environ['DJANGO_SECRET_KEY']
+    ALLOWED_HOSTS = [os.environ['SITENAME']]
+    service_account_key = os.environ.get('FIREBASE_SERVICE_ACCOUNT_KEY')
+else:
+    DEBUG = True
+    SECRET_KEY = 'django-insecure-oo7se-1kit&2io$z@l$@13o@47ls-i0$0h8)7^*jdl@lcx%&y&'
+    ALLOWED_HOSTS = []
+    service_account_key = 'firebase/chonmessageserver-firebase-adminsdk-otgil-7c02e9bc5e.json'
+
+
+# Initialize firebase admin sdk
+cred = credentials.Certificate(service_account_key)
+firebase_admin.initialize_app(cred)
 
 # Application definition
 

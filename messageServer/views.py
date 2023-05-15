@@ -89,6 +89,12 @@ def get_member_list(request, group_id):
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
+def set_group_picture(request, group_id):
+    pass
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def add_member(request, group_id, user_id):
     try:
         group = Group.objects.get(id=group_id)
@@ -145,6 +151,17 @@ def create_conversation(request, group_id):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
+def get_conversation(request, conversation_id):
+    try:
+        conversation = Conversation.objects.get(id=conversation_id)
+        serializer = ConversationSerializer(conversation)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    except Conversation.DoesNotExist:
+        return Response({'error': 'Group does not exist'}, status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def get_conversation_list(request, group_id):
     try:
         group = Group.objects.get(id=group_id)
@@ -154,6 +171,12 @@ def get_conversation_list(request, group_id):
     conversations = group.conversations.all()
     serializer = ConversationSerializer(conversations, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def set_conversation_picture(request, conversation_id):
+    pass
 
 
 """
@@ -232,8 +255,23 @@ def get_current_user(request):
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
-def add_profile_picture(request):
+def set_profile_picture(request):
     pass
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def set_fcm_token(request):
+    user = request.user
+    token = request.get('fcm_token')
+    try:
+        user.fcm_registration_token = token
+        user.save()
+        serializer = UserSerializer(user)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    except User.DoesNotExist:
+        return Response({'error': 'User does not exist'}, status=status.HTTP_404_NOT_FOUND)
+
 
 
 class LoginView(APIView):

@@ -10,6 +10,13 @@ class LoginSerializer(serializers.Serializer):
     password = serializers.CharField()
 
 
+class GroupSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Group
+        fields = '__all__'
+
+
 class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -36,13 +43,6 @@ class MessageSerializer(serializers.ModelSerializer):
         )
 
         return message
-
-
-class GroupSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Group
-        fields = '__all__'
 
 
 class ConversationSerializer(serializers.ModelSerializer):

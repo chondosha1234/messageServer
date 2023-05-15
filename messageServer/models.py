@@ -40,6 +40,7 @@ class UserManager(BaseUserManager):
 
 class User(AbstractBaseUser, PermissionsMixin):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    fcm_registration_token = models.CharField(max_length=255, blank=True, null=True)
     email = models.EmailField(unique=True)
     username = models.CharField(max_length=255, unique=True, blank=True)
     is_active = models.BooleanField(default=True)

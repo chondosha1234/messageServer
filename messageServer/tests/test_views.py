@@ -291,6 +291,18 @@ class ConversationTests(APITestCase):
         self.assertEqual(Conversation.objects.count(), 1)
         self.assertEqual(Conversation.objects.first().book_title, 'test book')
 
+    def test_get_conversation(self):
+        user = User.objects.create(email="chondosha@example.com", username="chondosha")
+        self.client.force_authenticate(user=user)
+        group = Group.objects.create(name='test group')
+        conversation = Conversation.objects.create(book_title='test conversation1', group=group)
+
+        url = reverse('get_conversation', args=[conversation.id])
+        response = self.client.get(url, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['book_title'], conversation.book_title)
+
     def test_get_conversation_list(self):
         group = Group.objects.create(name='test group')
         user = User.objects.create(email="chondosha@example.com", username="chondosha")
