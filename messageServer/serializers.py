@@ -11,17 +11,29 @@ class LoginSerializer(serializers.Serializer):
 
 
 class GroupSerializer(serializers.ModelSerializer):
+    picture_url = serializers.SerializerMethodField()
+
+    def get_picture_url(self, group):
+        if group.picture:
+            return group.picture.url
+        return None
 
     class Meta:
         model = Group
-        fields = '__all__'
+        fields = ['id', 'name', 'picture_url']
 
 
 class UserSerializer(serializers.ModelSerializer):
+    picture_url = serializers.SerializerMethodField()
+
+    def get_picture_url(self, user):
+        if user.picture:
+            return user.picture.url
+        return None
 
     class Meta:
         model = User
-        fields = ['id', 'email', 'username', 'groups', 'friends', 'picture']
+        fields = ['id', 'email', 'username', 'picture_url']
 
 
 class MessageSerializer(serializers.ModelSerializer):
@@ -46,10 +58,17 @@ class MessageSerializer(serializers.ModelSerializer):
 
 
 class ConversationSerializer(serializers.ModelSerializer):
+    picture_url = serializers.SerializerMethodField()
+
+    def get_picture_url(self, conversation):
+        if conversation.picture:
+            return conversation.picture.url
+        return None
 
     class Meta:
         model = Conversation
-        fields = '__all__'
+        fields = ['id', 'book_title', 'group', 'picture_url']
+
 
     def create(self, validated_data):
         book_title = validated_data.pop('book_title')
