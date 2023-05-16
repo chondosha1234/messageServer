@@ -7,6 +7,7 @@ from .models import Message, Group, Conversation
 from .serializers import MessageSerializer, GroupSerializer, ConversationSerializer, UserSerializer, LoginSerializer
 from django.contrib.auth import get_user_model
 from django.contrib.auth import authenticate, login, logout
+from firebase_admin import messaging
 
 User = get_user_model()
 
@@ -16,6 +17,7 @@ API views related to messages
 """
 
 @api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def send_message(request):
     sender_id = request.data.get('sender')
     try:
@@ -29,13 +31,32 @@ def send_message(request):
     serializer = MessageSerializer(data=request.data)
     if serializer.is_valid():
         serializer.save()
+
+        #Send FCM notifications to all members of group
+        conversation_id = request.data.get('conversation')
+        conversation = Conversation.objects.get(id=conversation_id)
+        members = conversation.group.members.all()
+        registration_tokens = [member.fcm_registration_token for member in members]
+
+        title = "New Message(s)"
+        body = f"You have new messages!"
+        message = messaging.MulticastMessage(
+            notification=messaging.Notification(
+                title=title,
+                body=body
+            ),
+            tokens=registration_tokens
+        )
+        messaging.send_multicast(message)
+
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def get_messages(request, conversation_id):
-    messages = Message.objects.filter(conversation=conversation_id)
+    messages = Message.objects.filter(conversation=conversation_id).order_by('-created_at')
     serializer = MessageSerializer(messages, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
 

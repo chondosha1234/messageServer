@@ -44,8 +44,9 @@ class MessageTests(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 2)
-        self.assertEqual(response.data[0]['text'], message1.text)
-        self.assertEqual(response.data[1]['text'], message2.text)
+        #because of order_by latest message is first
+        self.assertEqual(response.data[0]['text'], message2.text)
+        self.assertEqual(response.data[1]['text'], message1.text)
 
 
 class UserTests(APITestCase):
