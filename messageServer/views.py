@@ -213,7 +213,21 @@ def get_conversation_list(request, group_id):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def set_conversation_picture(request, conversation_id):
-    pass
+    try:
+        conversation = Conversation.objects.get(id=conversation_id)
+    except Conversation.DoesNotExist:
+        return Response({'error': 'Conversation does not exist'}, status=status.HTTP_404_NOT_FOUND)
+
+    base64_image = request.data.get('picture')
+
+    image_data = base64_image.split(';base64,')[-1]
+    image_file = ContentFile(base64.b64decode(image_data))
+    filename = f"conversation_{conversation_id}.jpg"
+
+    conversation.picture.save(filename, image_file)
+    conversation.save()
+    serializer = ConversationSerializer(conversation)
+    return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 """
@@ -293,7 +307,21 @@ def get_current_user(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def set_profile_picture(request):
-    pass
+    user = request.user
+
+    base64_image = request.data.get('picture')
+
+    image_data = base64_image.split(';base64,')[-1]
+    image_file = ContentFile(base64.b64decode(image_data))
+    filename = f"user_{user.id}.jpg"
+
+    try:
+        user.picture.save(filename, image_file)
+        user.save()
+        serializer = UserSerializer(user)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    except User.DoesNotExist:
+        return Response({'error': 'User does not exist'}, status=status.HTTP_404_NOT_FOUND)
 
 
 @api_view(['POST'])

@@ -52,6 +52,7 @@ class MessageTests(APITestCase):
         self.assertEqual(response.data[1]['text'], message1.text)
 
 
+@override_settings(MEDIA_ROOT='media_test')
 class UserTests(APITestCase):
 
     def test_create_user(self):
@@ -109,6 +110,24 @@ class UserTests(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['username'], 'chondosha')
+
+    def test_set_profile_picture(self):
+        user = User.objects.create(email="chondosha@example.com", username="chondosha")
+        self.client.force_authenticate(user=user)
+
+        with open('messageServer/tests/images/daffodil.jpg', 'rb') as image_file:
+            image_data = image_file.read()
+        base64_image = base64.b64encode(image_data).decode('utf-8')
+        data = {
+            'picture': base64_image
+        }
+        url = reverse('set_profile_picture')
+        response = self.client.post(url, data, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['username'], 'chondosha')
+
+        shutil.rmtree('media_test/user_pictures', ignore_errors=True)
 
 
 class FriendsListTests(APITestCase):
@@ -295,6 +314,7 @@ class GroupTests(APITestCase):
         shutil.rmtree('media_test/group_pictures', ignore_errors=True)
 
 
+@override_settings(MEDIA_ROOT='media_test')
 class ConversationTests(APITestCase):
 
     def test_create_conversation(self):
@@ -344,3 +364,23 @@ class ConversationTests(APITestCase):
         self.assertEqual(len(response.data), 2)
         self.assertEqual(response.data[0]['book_title'], conversation1.book_title)
         self.assertEqual(response.data[1]['book_title'], conversation2.book_title)
+
+    def test_set_conversation_picture(self):
+        user = User.objects.create(email="chondosha@example.com", username="chondosha")
+        self.client.force_authenticate(user=user)
+        group = Group.objects.create(name='test group')
+        conversation = Conversation.objects.create(book_title='test conversation', group=group)
+
+        with open('messageServer/tests/images/daffodil.jpg', 'rb') as image_file:
+            image_data = image_file.read()
+        base64_image = base64.b64encode(image_data).decode('utf-8')
+        data = {
+            'picture': base64_image
+        }
+        url = reverse('set_conversation_picture', args=[conversation.id])
+        response = self.client.post(url, data, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['book_title'], 'test conversation')
+
+        shutil.rmtree('media_test/conversation_pictures', ignore_errors=True)
