@@ -7,7 +7,9 @@ from .models import Message, Group, Conversation
 from .serializers import MessageSerializer, GroupSerializer, ConversationSerializer, UserSerializer, LoginSerializer
 from django.contrib.auth import get_user_model
 from django.contrib.auth import authenticate, login, logout
+from django.core.files.base import ContentFile
 from firebase_admin import messaging
+import base64
 
 User = get_user_model()
 
@@ -111,7 +113,21 @@ def get_member_list(request, group_id):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def set_group_picture(request, group_id):
-    pass
+    try:
+        group = Group.objects.get(id=group_id)
+    except Group.DoesNotExist:
+        return Response({'error': 'Group does not exist'}, status=status.HTTP_404_NOT_FOUND)
+
+    base64_image = request.data.get('picture')
+
+    image_data = base64_image.split(';base64,')[-1]
+    image_file = ContentFile(base64.b64decode(image_data))
+    filename = f"group_{group_id}.jpg"
+
+    group.picture.save(filename, image_file)
+    group.save()
+    serializer = GroupSerializer(group)
+    return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 @api_view(['POST'])

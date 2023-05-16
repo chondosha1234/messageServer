@@ -4,6 +4,9 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 from messageServer.models import Message, Group, Conversation
 from messageServer.serializers import MessageSerializer, GroupSerializer, UserSerializer
+from django.test import override_settings
+import base64
+import shutil
 
 User = get_user_model()
 
@@ -171,6 +174,7 @@ class FriendsListTests(APITestCase):
         self.assertEqual(response.data, [])
 
 
+@override_settings(MEDIA_ROOT='media_test')
 class GroupTests(APITestCase):
 
     def test_create_group(self):
@@ -270,6 +274,25 @@ class GroupTests(APITestCase):
         self.assertEqual(group.members.all().count(), 1)
         self.assertEqual(group.members.first().username, user.username)
         self.assertEqual(group.members.last().username, user.username)
+
+    def test_set_group_picture(self):
+        user = User.objects.create(email="chondosha@example.com", username="chondosha")
+        self.client.force_authenticate(user=user)
+        group = Group.objects.create(name='test group')
+
+        with open('messageServer/tests/images/daffodil.jpg', 'rb') as image_file:
+            image_data = image_file.read()
+        base64_image = base64.b64encode(image_data).decode('utf-8')
+        data = {
+            'picture': base64_image
+        }
+        url = reverse('set_group_picture', args=[group.id])
+        response = self.client.post(url, data, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['name'], 'test group')
+
+        shutil.rmtree('media_test/group_pictures', ignore_errors=True)
 
 
 class ConversationTests(APITestCase):
