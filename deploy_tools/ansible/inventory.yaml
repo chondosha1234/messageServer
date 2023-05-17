@@ -1,4 +1,4 @@
 virtualmachines:
   hosts:
     staging_chon:
-      ansible_host: chon@ec2-44-203-52-30.compute-1.amazonaws.com
+      ansible_host: chon@ec2-3-86-94-93.compute-1.amazonaws.com
