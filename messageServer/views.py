@@ -280,7 +280,7 @@ class CreateUserView(generics.CreateAPIView):
     serializer_class = UserSerializer
     authentication_classes = []
 
-
+"""
 @api_view(['GET'])
 def get_user(request, user_id):
     try:
@@ -291,7 +291,7 @@ def get_user(request, user_id):
         return Response(user_serializer.data, status=status.HTTP_200_OK)
     except User.DoesNotExist:
         return Response({'error': 'User does not exist'}, status=status.HTTP_404_NOT_FOUND)
-
+"""
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])

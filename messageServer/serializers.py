@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import Message, Group, Conversation
 from django.contrib.auth import get_user_model
+from django.conf import settings
 
 User = get_user_model()
 
@@ -15,7 +16,7 @@ class GroupSerializer(serializers.ModelSerializer):
 
     def get_picture_url(self, group):
         if group.picture:
-            return group.picture.url
+            return settings.SITE_URL + group.picture.url
         return None
 
     class Meta:
@@ -28,7 +29,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     def get_picture_url(self, user):
         if user.picture:
-            return user.picture.url
+            return settings.SITE_URL + user.picture.url
         return None
 
     class Meta:
@@ -62,7 +63,7 @@ class ConversationSerializer(serializers.ModelSerializer):
 
     def get_picture_url(self, conversation):
         if conversation.picture:
-            return conversation.picture.url
+            return settings.SITE_URL + conversation.picture.url
         return None
 
     class Meta:

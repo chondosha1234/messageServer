@@ -1,0 +1,87 @@
+- name: deploy site
+
+  hosts: virtualmachines
+
+  vars:
+    project_dir: /home/{{user}}/sites/{{sitename}}
+    git_repo: https://github.com/chondosha1234/messageServer.git
+
+  tasks:
+
+    - name: make folder for new deploy
+      shell: mkdir -p {{ project_dir|quote }}
+
+    - name: clone git if needed
+      git:
+        repo: '{{ git_repo }}'
+        dest: '{{ project_dir }}'
+        force: yes
+
+    - name: find virtualenv
+      stat:
+        path: '{{ project_dir }}/virtualenv/bin/pip'
+      register: venv_register
+
+    - name: create virtualenv
+      shell: python3 -m venv virtualenv
+      args:
+        chdir: '{{ project_dir }}'
+      when: venv_register.stat.exists == False
+
+    - name: update virtualenv
+      shell: ./virtualenv/bin/pip install -r requirements.txt
+      args:
+        chdir: '{{ project_dir }}'
+
+    - name: create dotenv
+      shell: touch .env
+      args:
+        chdir: '{{ project_dir }}'
+        creates: .env
+
+    - name: add django debug to dotenv
+      lineinfile:
+        path: '{{ project_dir }}/.env'
+        regexp: '^DJANGO_DEBUG_FALSE'
+        line: 'DJANGO_DEBUG_FALSE=y'
+
+    - name: add sitename to dotenv
+      lineinfile:
+        path: '{{ project_dir }}/.env'
+        regexp: '^SITENAME'
+        line: 'SITENAME={{sitename}}'
+
+    - name: check for secret key
+      lineinfile:
+        state: absent
+        path: '{{ project_dir }}/.env'
+        regexp: '^DJANGO_SECRET_KEY'
+      check_mode: true
+      changed_when: false
+      register: key_register
+
+    - name: make random key
+      set_fact:
+        random_key: "{{ lookup('password', '/dev/null chars=ascii_lowercase,digits length=50') }}"
+      when: not key_register.found
+
+    - name: add secret key
+      lineinfile:
+        state: present
+        path: '{{ project_dir }}/.env'
+        line: 'DJANGO_SECRET_KEY={{random_key}}'
+      when: not key_register.found
+
+    - name: makemigrations database
+      shell: ./virtualenv/bin/python manage.py makemigrations
+      args:
+        chdir: '{{ project_dir }}'
+
+    - name: migrate database
+      shell: ./virtualenv/bin/python manage.py migrate --noinput
+      args:
+        chdir: '{{ project_dir }}'
+
+    - name: restart gunicorn
+      shell: systemctl restart gunicorn-{{sitename|quote}}
+      become: yes

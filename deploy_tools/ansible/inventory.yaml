@@ -1,0 +1,4 @@
+virtualmachines:
+  hosts:
+    staging_chon:
+      ansible_host: chon@ec2-3-238-91-84.compute-1.amazonaws.com

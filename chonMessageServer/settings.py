@@ -30,11 +30,13 @@ if 'DJANGO_DEBUG_FALSE' in os.environ:
     DEBUG = False
     SECRET_KEY = os.environ['DJANGO_SECRET_KEY']
     ALLOWED_HOSTS = [os.environ['SITENAME']]
+    SITE_URL = os.environ['SITENAME']
     service_account_key = os.environ.get('FIREBASE_SERVICE_ACCOUNT_KEY')
 else:
     DEBUG = True
     SECRET_KEY = 'django-insecure-oo7se-1kit&2io$z@l$@13o@47ls-i0$0h8)7^*jdl@lcx%&y&'
     ALLOWED_HOSTS = []
+    SITE_URL = 'http://localhost:8000'
     service_account_key = 'firebase/chonmessageserver-firebase-adminsdk-otgil-7c02e9bc5e.json'
 
 
@@ -148,7 +150,7 @@ STATIC_URL = 'static/'
 # Media files
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-MEDIA_URL = 'media/'
+MEDIA_URL = '/media/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
