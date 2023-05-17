@@ -41,9 +41,7 @@ else:
 
 
 # Initialize firebase admin sdk
-print(os.environ['DJANGO_SECRET_KEY'])
-print(os.environ['SITENAME'])
-print(os.environ['FIREBASE_SERVICE_ACCOUNT_KEY'])
+print(os.environ)
 cred = credentials.Certificate(service_account_key)
 firebase_admin.initialize_app(cred)
 

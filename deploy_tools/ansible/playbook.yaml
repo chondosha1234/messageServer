@@ -55,7 +55,7 @@
       lineinfile:
         path: '{{ project_dir }}/.env'
         regexp: '^FIREBASE_SERVICE_ACCOUNT_KEY'
-        line: 'FIRE_BASE_SERVICE_ACCOUNT_KEY={{ firebase_key }}'
+        line: 'FIREBASE_SERVICE_ACCOUNT_KEY={{ firebase_key }}'
 
     - name: check for secret key
       lineinfile:
