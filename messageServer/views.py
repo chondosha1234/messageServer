@@ -3,6 +3,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.exceptions import ValidationError
 from .models import Message, Group, Conversation
 from .serializers import MessageSerializer, GroupSerializer, ConversationSerializer, UserSerializer, LoginSerializer
 from django.contrib.auth import get_user_model
@@ -280,6 +281,18 @@ class CreateUserView(generics.CreateAPIView):
     serializer_class = UserSerializer
     authentication_classes = []
 
+    def create(self, request, *args, **kwargs):
+        try:
+            response = super().create(request, *args, **kwargs)
+            user = User.objects.get(id=response.data['id'])
+            serializer = self.get_serializer(user)
+            response_data = {
+                'users': [serializer.data]
+            }
+            return Response(response_data, status=status.HTTP_201_CREATED)
+        except ValidationError:
+            return Response({'detail': 'An error occured while creating user'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 """
 @api_view(['GET'])
 def get_user(request, user_id):
@@ -299,7 +312,10 @@ def get_current_user(request):
     user = request.user
     if user:
         serializer = UserSerializer(user)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        response_data = {
+            'users': [serializer.data]
+        }
+        return Response(response_data, status=status.HTTP_200_OK)
     else:
         return Response({'error': 'User does not exist'}, status=status.HTTP_404_NOT_FOUND)
 

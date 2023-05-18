@@ -68,8 +68,8 @@ class UserTests(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(User.objects.count(), 1)
-        self.assertEqual(response.data['username'], 'chondosha')
-        self.assertEqual(response.data['email'], 'chondosha@example.org')
+        self.assertEqual(response.data['users'][0]['username'], 'chondosha')
+        self.assertEqual(response.data['users'][0]['email'], 'chondosha@example.org')
 
 
     def test_login_successful(self):
@@ -109,7 +109,7 @@ class UserTests(APITestCase):
         response = self.client.get(url, format='json')
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['username'], 'chondosha')
+        self.assertEqual(response.data['users'][0]['username'], 'chondosha')
 
     def test_set_profile_picture(self):
         user = User.objects.create(email="chondosha@example.com", username="chondosha")
