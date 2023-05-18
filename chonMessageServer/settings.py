@@ -75,7 +75,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'messageServer.urls.log_request_middleware'
 ]
 
 ROOT_URLCONF = 'chonMessageServer.urls'
