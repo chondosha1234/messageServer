@@ -1,6 +1,7 @@
 from django.urls import path
 from . import views
 from messageServer.views import CreateUserView, LoginView, LogoutView
+import logging
 
 urlpatterns = [
     path('messages/send/', views.send_message, name='send_message'),
@@ -26,3 +27,11 @@ urlpatterns = [
     path('login', LoginView.as_view(), name='login'),
     path('logout', LogoutView.as_view(), name='logout')
 ]
+
+logger = logging.getLogger('django')
+
+def log_request_middleware(get_response):
+    def middleware(request):
+        logger.info(f'Request: {request.method} {request.path}')
+        return get_response(request)
+    return middleware
