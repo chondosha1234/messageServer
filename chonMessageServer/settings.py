@@ -31,17 +31,15 @@ if 'DJANGO_DEBUG_FALSE' in os.environ:
     SECRET_KEY = os.environ['DJANGO_SECRET_KEY']
     ALLOWED_HOSTS = [os.environ['SITENAME']]
     SITE_URL = os.environ['SITENAME']
-    service_account_key = os.environ.get('FIREBASE_SERVICE_ACCOUNT_KEY')
 else:
     DEBUG = True
     SECRET_KEY = 'django-insecure-oo7se-1kit&2io$z@l$@13o@47ls-i0$0h8)7^*jdl@lcx%&y&'
     ALLOWED_HOSTS = []
     SITE_URL = 'http://localhost:8000'
-    service_account_key = 'firebase/chonmessageserver-firebase-adminsdk-otgil-7c02e9bc5e.json'
 
 
 # Initialize firebase admin sdk
-cred = credentials.Certificate(service_account_key)
+cred = credentials.Certificate('firebase/service_key.json')
 firebase_admin.initialize_app(cred)
 
 # Application definition

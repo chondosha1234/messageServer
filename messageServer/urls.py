@@ -2,6 +2,7 @@ from django.urls import path
 from . import views
 from messageServer.views import CreateUserView, LoginView, LogoutView
 
+
 urlpatterns = [
     path('messages/send/', views.send_message, name='send_message'),
     path('messages/<uuid:conversation_id>', views.get_messages, name='get_messages'),

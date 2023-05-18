@@ -7,7 +7,7 @@ User=chon
 WorkingDirectory=/home/chon/sites/DOMAIN
 EnvironmentFile=/home/chon/sites/DOMAIN/.env
 
-ExecStart=/home/chon/sites/DOMAIN/virtualenv/bin/gunicorn --bind unix:/tmp/DOMAIN.socket conMessageServer.wsgi:application
+ExecStart=/home/chon/sites/DOMAIN/virtualenv/bin/gunicorn --bind unix:/tmp/DOMAIN.socket chonMessageServer.wsgi:application
 
 [Install]
 WantedBy=multi-user.target
