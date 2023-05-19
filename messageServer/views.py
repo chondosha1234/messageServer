@@ -52,7 +52,10 @@ def send_message(request):
         )
         messaging.send_multicast(message)
 
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        response_data = {
+            'messages': [serializer.data]
+        }
+        return Response(response_data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -61,7 +64,10 @@ def send_message(request):
 def get_messages(request, conversation_id):
     messages = Message.objects.filter(conversation=conversation_id).order_by('-created_at')
     serializer = MessageSerializer(messages, many=True)
-    return Response(serializer.data, status=status.HTTP_200_OK)
+    response_data = {
+        'messages': [serializer.data]
+    }
+    return Response(response_data, status=status.HTTP_200_OK)
 
 
 """
@@ -74,7 +80,10 @@ def create_group(request):
     serializer = GroupSerializer(data=request.data)
     if serializer.is_valid():
         serializer.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        response_data = {
+            'groups': [serializer.data]
+        }
+        return Response(response_data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -84,7 +93,10 @@ def get_group(request, group_id):
     try:
         group = Group.objects.get(id=group_id)
         serializer = GroupSerializer(group)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        response_data = {
+            'groups': [serializer.data]
+        }
+        return Response(response_data, status=status.HTTP_200_OK)
     except GroupDoesNotExist:
         return Response({'error': 'Group does not exist'}, status=status.HTTP_404_NOT_FOUND)
 
@@ -95,7 +107,10 @@ def get_group_list(request):
     user = request.user
     groups = user.groups
     serializer = GroupSerializer(groups, many=True)
-    return Response(serializer.data, status=status.HTTP_200_OK)
+    response_data = {
+        'groups': [serializer.data]
+    }
+    return Response(response_data, status=status.HTTP_200_OK)
 
 
 @api_view(['GET'])
@@ -108,7 +123,10 @@ def get_member_list(request, group_id):
 
     members = group.members.all()
     serializer = UserSerializer(members, many=True)
-    return Response(serializer.data, status=status.HTTP_200_OK)
+    response_data = {
+        'users': [serializer.data]
+    }
+    return Response(response_data, status=status.HTTP_200_OK)
 
 
 @api_view(['POST'])
@@ -128,7 +146,10 @@ def set_group_picture(request, group_id):
     group.picture.save(filename, image_file)
     group.save()
     serializer = GroupSerializer(group)
-    return Response(serializer.data, status=status.HTTP_200_OK)
+    response_data = {
+        'groups': [serializer.data]
+    }
+    return Response(response_data, status=status.HTTP_200_OK)
 
 
 @api_view(['POST'])
@@ -147,7 +168,10 @@ def add_member(request, group_id, user_id):
     if member not in group.members.all():
         group.members.add(member)
         serializer = GroupSerializer(group)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        response_data = {
+            'groups': [serializer.data]
+        }
+        return Response(response_data, status=status.HTTP_200_OK)
     else:
         return Response({'error': 'User already in group'}, status=status.HTTP_200_OK)
 
@@ -168,7 +192,10 @@ def remove_member(request, group_id, user_id):
     if member in group.members.all():
         group.members.remove(member)
         serializer = GroupSerializer(group)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        response_data = {
+            'groups': [serializer.data]
+        }
+        return Response(response_data, status=status.HTTP_200_OK)
     else:
         return Response({'error': 'User not in group'}, status=status.HTTP_404_NOT_FOUND)
 
@@ -183,7 +210,10 @@ def create_conversation(request, group_id):
     serializer = ConversationSerializer(data=request.data)
     if serializer.is_valid():
         serializer.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        response_data = {
+            'conversations': [serializer.data]
+        }
+        return Response(response_data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -193,7 +223,10 @@ def get_conversation(request, conversation_id):
     try:
         conversation = Conversation.objects.get(id=conversation_id)
         serializer = ConversationSerializer(conversation)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        response_data = {
+            'conversations': [serializer.data]
+        }
+        return Response(response_data, status=status.HTTP_200_OK)
     except Conversation.DoesNotExist:
         return Response({'error': 'Group does not exist'}, status=status.HTTP_404_NOT_FOUND)
 
@@ -208,7 +241,10 @@ def get_conversation_list(request, group_id):
 
     conversations = group.conversations.all()
     serializer = ConversationSerializer(conversations, many=True)
-    return Response(serializer.data, status=status.HTTP_200_OK)
+    response_data = {
+        'conversations': [serializer.data]
+    }
+    return Response(response_data, status=status.HTTP_200_OK)
 
 
 @api_view(['POST'])
@@ -228,7 +264,10 @@ def set_conversation_picture(request, conversation_id):
     conversation.picture.save(filename, image_file)
     conversation.save()
     serializer = ConversationSerializer(conversation)
-    return Response(serializer.data, status=status.HTTP_200_OK)
+    response_data = {
+        'conversations': [serializer.data]
+    }
+    return Response(response_data, status=status.HTTP_200_OK)
 
 
 """
@@ -242,8 +281,11 @@ def add_friend(request, user_id):
         friend = User.objects.get(id=user_id)
         user = request.user
         user.friends.add(friend)
-        user_serializer = UserSerializer(user)
-        return Response(user_serializer.data, status=status.HTTP_200_OK)
+        serializer = UserSerializer(user)
+        response_data = {
+            'users': [serializer.data]
+        }
+        return Response(response_data, status=status.HTTP_200_OK)
     except User.DoesNotExist:
         return Response({'error': 'User does not exist'}, status=status.HTTP_404_NOT_FOUND)
 
@@ -256,8 +298,11 @@ def remove_friend(request, user_id):
         user = request.user
         if friend in user.friends.all():
             user.friends.remove(friend)
-            user_serializer = UserSerializer(user)
-            return Response(user_serializer.data, status=status.HTTP_200_OK)
+            serializer = UserSerializer(user)
+            response_data = {
+                'users': [serializer.data]
+            }
+            return Response(response_data, status=status.HTTP_200_OK)
         else:
             return Response({'error': f'{friend.username} is not in friends list'}, status=status.HTTP_400_BAD_REQUEST)
     except User.DoesNotExist:
@@ -272,7 +317,10 @@ def get_friends_list(request):
 
     if friends is not None:
         serializer = UserSerializer(friends, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        response_data = {
+            'users': [serializer.data]
+        }
+        return Response(response_data, status=status.HTTP_200_OK)
     else:
         return Response({'detail': 'An error occurred while checking the friends list'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
@@ -335,7 +383,10 @@ def set_profile_picture(request):
         user.picture.save(filename, image_file)
         user.save()
         serializer = UserSerializer(user)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        response_data = {
+            'users': [serializer.data]
+        }
+        return Response(response_data, status=status.HTTP_200_OK)
     except User.DoesNotExist:
         return Response({'error': 'User does not exist'}, status=status.HTTP_404_NOT_FOUND)
 
@@ -349,7 +400,10 @@ def set_fcm_token(request):
         user.fcm_registration_token = token
         user.save()
         serializer = UserSerializer(user)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        response_data = {
+            'users': [serializer.data]
+        }
+        return Response(response_data, status=status.HTTP_200_OK)
     except User.DoesNotExist:
         return Response({'error': 'User does not exist'}, status=status.HTTP_404_NOT_FOUND)
 
@@ -369,7 +423,10 @@ class LoginView(APIView):
         if user is not None:
             login(request, user)
             user_serializer = UserSerializer(user)
-            return Response(user_serializer.data, status=status.HTTP_200_OK)
+            response_data = {
+                'users': [user_serializer.data]
+            }
+            return Response(response_data, status=status.HTTP_200_OK)
         else:
             return Response({'detail': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
 

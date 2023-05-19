@@ -46,10 +46,10 @@ class MessageTests(APITestCase):
         response = self.client.get(url, format='json')
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), 2)
-        #because of order_by latest message is first
-        self.assertEqual(response.data[0]['text'], message2.text)
-        self.assertEqual(response.data[1]['text'], message1.text)
+        self.assertEqual(len(response.data['messages'][0]), 2)
+        #because of order_by latest message is first,  also the [0][1] is because messages is list and there is ordered dictionary as only element
+        self.assertEqual(response.data['messages'][0][0]['text'], message2.text)
+        self.assertEqual(response.data['messages'][0][1]['text'], message1.text)
 
 
 @override_settings(MEDIA_ROOT='media_test')
@@ -85,7 +85,7 @@ class UserTests(APITestCase):
         response = self.client.post(url, data, format='json')
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['username'], 'chondosha')
+        self.assertEqual(response.data['users'][0]['username'], 'chondosha')
 
     def test_login_invalid_credentials(self):
         data = {
@@ -125,7 +125,7 @@ class UserTests(APITestCase):
         response = self.client.post(url, data, format='json')
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['username'], 'chondosha')
+        self.assertEqual(response.data['users'][0]['username'], 'chondosha')
 
         shutil.rmtree('media_test/user_pictures', ignore_errors=True)
 
@@ -177,7 +177,7 @@ class FriendsListTests(APITestCase):
         response = self.client.get(url, format='json')
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        response_emails = [friend['email'] for friend in response.data]
+        response_emails = [friend['email'] for friend in response.data['users'][0]]
         self.assertCountEqual(response_emails, [friend1.email, friend2.email])
 
     def test_get_friends_list_returns_empty_list(self):
@@ -190,7 +190,7 @@ class FriendsListTests(APITestCase):
         response = self.client.get(url, format='json')
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data, [])
+        self.assertEqual(response.data['users'][0], [])
 
 
 @override_settings(MEDIA_ROOT='media_test')
@@ -221,7 +221,7 @@ class GroupTests(APITestCase):
         response = self.client.get(url, format='json')
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['name'], group.name)
+        self.assertEqual(response.data['groups'][0]['name'], group.name)
 
     def test_get_group_list(self):
         user = User.objects.create(email="chondosha@example.com", username="chondosha")
@@ -236,8 +236,8 @@ class GroupTests(APITestCase):
         response = self.client.get(url, format='json')
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), 2)
-        response_group_names = [group['name'] for group in response.data]
+        self.assertEqual(len(response.data['groups'][0]), 2)
+        response_group_names = [group['name'] for group in response.data['groups'][0]]
         self.assertCountEqual(response_group_names, [group1.name, group2.name])
 
     def test_get_member_list(self):
@@ -253,9 +253,9 @@ class GroupTests(APITestCase):
         response = self.client.get(url, format='json')
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), 2)
-        self.assertEqual(response.data[0]['username'], user.username)
-        self.assertEqual(response.data[1]['username'], other_user.username)
+        self.assertEqual(len(response.data['users'][0]), 2)
+        response_titles = [user['username'] for user in response.data['users'][0]]
+        self.assertCountEqual(response_titles, [user.username, other_user.username])
 
     def test_add_member(self):
         user = User.objects.create(email="chondosha@example.com", username="chondosha", password="chondosha5563")
@@ -309,7 +309,7 @@ class GroupTests(APITestCase):
         response = self.client.post(url, data, format='json')
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['name'], 'test group')
+        self.assertEqual(response.data['groups'][0]['name'], 'test group')
 
         shutil.rmtree('media_test/group_pictures', ignore_errors=True)
 
@@ -345,7 +345,7 @@ class ConversationTests(APITestCase):
         response = self.client.get(url, format='json')
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['book_title'], conversation.book_title)
+        self.assertEqual(response.data['conversations'][0]['book_title'], conversation.book_title)
 
     def test_get_conversation_list(self):
         group = Group.objects.create(name='test group')
@@ -361,9 +361,9 @@ class ConversationTests(APITestCase):
         response = self.client.get(url, format='json')
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), 2)
-        self.assertEqual(response.data[0]['book_title'], conversation1.book_title)
-        self.assertEqual(response.data[1]['book_title'], conversation2.book_title)
+        self.assertEqual(len(response.data['conversations'][0]), 2)
+        response_titles = [conversation['book_title'] for conversation in response.data['conversations'][0]]
+        self.assertCountEqual(response_titles, [conversation1.book_title, conversation2.book_title])
 
     def test_set_conversation_picture(self):
         user = User.objects.create(email="chondosha@example.com", username="chondosha")
@@ -381,6 +381,6 @@ class ConversationTests(APITestCase):
         response = self.client.post(url, data, format='json')
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['book_title'], 'test conversation')
+        self.assertEqual(response.data['conversations'][0]['book_title'], 'test conversation')
 
         shutil.rmtree('media_test/conversation_pictures', ignore_errors=True)
