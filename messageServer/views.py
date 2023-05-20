@@ -11,9 +11,11 @@ from django.contrib.auth import authenticate, login, logout
 from django.core.files.base import ContentFile
 from firebase_admin import messaging
 import base64
+import logging
 
 User = get_user_model()
 
+logger = logging.getLogger('django')
 
 """
 API views related to messages
@@ -413,6 +415,7 @@ class LoginView(APIView):
     authentication_classes = []
 
     def post(self, request):
+        logger.info(f'Request in login post: {request.data}')
         serializer = LoginSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
