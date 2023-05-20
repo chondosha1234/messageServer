@@ -2,13 +2,18 @@ from rest_framework import serializers
 from .models import Message, Group, Conversation
 from django.contrib.auth import get_user_model
 from django.conf import settings
+import logging
+
+logger = logging.getLogger('django')
 
 User = get_user_model()
 
 
 class LoginSerializer(serializers.Serializer):
+    logger.info('inside login serializer')
     username = serializers.CharField()
     password = serializers.CharField()
+    logger.info(f'value of username and password in serializer: {username} and {password}')
 
 
 class GroupSerializer(serializers.ModelSerializer):
