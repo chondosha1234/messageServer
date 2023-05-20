@@ -421,8 +421,10 @@ class LoginView(APIView):
 
         username = serializer.validated_data['username']
         password = serializer.validated_data['password']
+        logger.info(f'username and password after validated data: {username} and {password}')
 
         user = authenticate(username=username, password=password)
+        logger.info(f'user after authenticate: {user}')
         if user is not None:
             login(request, user)
             user_serializer = UserSerializer(user)
