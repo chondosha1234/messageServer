@@ -335,6 +335,9 @@ class CreateUserView(generics.CreateAPIView):
         try:
             response = super().create(request, *args, **kwargs)
             user = User.objects.get(id=response.data['id'])
+            password = request.data.get('password')
+            user.set_password(password)
+            user.save()
             serializer = self.get_serializer(user)
             response_data = {
                 'users': [serializer.data]
