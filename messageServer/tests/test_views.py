@@ -87,6 +87,30 @@ class UserTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['users'][0]['username'], 'chondosha')
 
+    def test_login_after_user_created_by_view(self):
+        data = {
+            'email': 'chondosha@example.org',
+            'username': 'chondosha',
+            'password': 'chondosha5563'
+        }
+        url = reverse('create_user')
+        response = self.client.post(url, data, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(User.objects.count(), 1)
+        self.assertEqual(response.data['users'][0]['username'], 'chondosha')
+        self.assertEqual(response.data['users'][0]['email'], 'chondosha@example.org')
+
+        data = {
+            'username': 'chondosha',
+            'password': 'chondosha5563'
+        }
+        url = reverse('login')
+        response = self.client.post(url, data, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['users'][0]['username'], 'chondosha')
+
     def test_login_invalid_credentials(self):
         data = {
             'username': 'invalid_user',
