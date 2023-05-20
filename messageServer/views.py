@@ -99,20 +99,23 @@ def get_group(request, group_id):
             'groups': [serializer.data]
         }
         return Response(response_data, status=status.HTTP_200_OK)
-    except GroupDoesNotExist:
+    except Group.DoesNotExist:
         return Response({'error': 'Group does not exist'}, status=status.HTTP_404_NOT_FOUND)
 
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_group_list(request):
-    user = request.user
-    groups = user.groups
-    serializer = GroupSerializer(groups, many=True)
-    response_data = {
-        'groups': [serializer.data]
-    }
-    return Response(response_data, status=status.HTTP_200_OK)
+    try:
+        user = request.user
+        groups = user.groups
+        serializer = GroupSerializer(groups, many=True)
+        response_data = {
+            'groups': [serializer.data]
+        }
+        return Response(response_data, status=status.HTTP_200_OK)
+    except User.DoesnotExist:
+        return Response({'error': 'User does not exist'}, status=status.HTTP_404_NOT_FOUND)
 
 
 @api_view(['GET'])
@@ -316,6 +319,8 @@ def remove_friend(request, user_id):
 def get_friends_list(request):
     user = request.user
     friends = user.friends.all()
+    logger.info(f"In get friends list view friends: {friends}")
+    logger.info(f"Is friends None?: {friends is None}")
 
     if friends is not None:
         serializer = UserSerializer(friends, many=True)
