@@ -2,6 +2,7 @@ from django.urls import reverse
 from django.contrib.auth import get_user_model
 from rest_framework import status
 from rest_framework.test import APITestCase
+from rest_framework.authtoken.models import Token
 from messageServer.models import Message, Group, Conversation
 from messageServer.serializers import MessageSerializer, GroupSerializer, UserSerializer
 from django.test import override_settings
@@ -85,7 +86,12 @@ class UserTests(APITestCase):
         response = self.client.post(url, data, format='json')
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['users'][0]['username'], 'chondosha')
+        self.assertTrue('token' in response.data)
+        self.assertTrue(isinstance(response.data['token']['key'], str))
+
+        token_key = response.data['token']['key']
+        token = Token.objects.get(key=token_key)
+        self.assertEqual(token.user, user)
 
     def test_login_after_user_created_by_view(self):
         data = {
@@ -109,7 +115,13 @@ class UserTests(APITestCase):
         response = self.client.post(url, data, format='json')
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['users'][0]['username'], 'chondosha')
+        self.assertTrue('token' in response.data)
+        self.assertTrue(isinstance(response.data['token']['key'], str))
+
+        user = User.objects.first()
+        token_key = response.data['token']['key']
+        token = Token.objects.get(key=token_key)
+        self.assertEqual(token.user, user)
 
     def test_login_invalid_credentials(self):
         data = {

@@ -52,7 +52,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'messageServer',
-    'rest_framework'
+    'rest_framework',
+    'rest_framework.authtoken'
 ]
 
 AUTH_USER_MODEL = 'messageServer.User'
@@ -63,6 +64,7 @@ AUTHENTICATION_BACKENDS = [
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'messageServer.authentication.CustomAuthenticationBackend',
+        'rest_framework.authentication.TokenAuthentication',
         'rest_framework.authentication.SessionAuthentication',
     ]
 }

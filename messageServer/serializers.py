@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from rest_framework.authtoken.models import Token
 from .models import Message, Group, Conversation
 from django.contrib.auth import get_user_model
 from django.conf import settings
@@ -14,6 +15,13 @@ class LoginSerializer(serializers.Serializer):
     username = serializers.CharField()
     password = serializers.CharField()
     logger.info(f'value of username and password in serializer: {username} and {password}')
+
+
+class TokenSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Token
+        fields = ['key']
 
 
 class GroupSerializer(serializers.ModelSerializer):

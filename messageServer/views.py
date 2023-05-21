@@ -4,8 +4,9 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.exceptions import ValidationError
+from rest_framework.authtoken.models import Token
 from .models import Message, Group, Conversation
-from .serializers import MessageSerializer, GroupSerializer, ConversationSerializer, UserSerializer, LoginSerializer
+from .serializers import MessageSerializer, GroupSerializer, ConversationSerializer, UserSerializer, LoginSerializer, TokenSerializer
 from django.contrib.auth import get_user_model
 from django.contrib.auth import authenticate, login, logout
 from django.core.files.base import ContentFile
@@ -435,9 +436,12 @@ class LoginView(APIView):
         logger.info(f'user after authenticate: {user}')
         if user is not None:
             login(request, user)
-            user_serializer = UserSerializer(user)
+            token = Token.objects.get(user=user)
+            logger.info(f'token value after login: {token}')
+            token_serializer = TokenSerializer(token)
+            #user_serializer = UserSerializer(user)
             response_data = {
-                'users': [user_serializer.data]
+                'token': token_serializer.data
             }
             return Response(response_data, status=status.HTTP_200_OK)
         else:
