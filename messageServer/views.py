@@ -440,7 +440,10 @@ class LoginView(APIView):
             logger.info(f'token value after login: {token}')
             token_serializer = TokenSerializer(token)
             #user_serializer = UserSerializer(user)
-            return Response(token_serializer.data, status=status.HTTP_200_OK)
+            response_data = {
+                'token': token_serializer.data
+            }
+            return Response(response_data, status=status.HTTP_200_OK)
         else:
             return Response({'detail': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
 
