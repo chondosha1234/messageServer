@@ -86,10 +86,10 @@ class UserTests(APITestCase):
         response = self.client.post(url, data, format='json')
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertTrue('token' in response.data)
-        self.assertTrue(isinstance(response.data['token']['key'], str))
+        self.assertTrue('key' in response.data)
+        self.assertTrue(isinstance(response.data['key'], str))
 
-        token_key = response.data['token']['key']
+        token_key = response.data['key']
         token = Token.objects.get(key=token_key)
         self.assertEqual(token.user, user)
 
@@ -115,11 +115,11 @@ class UserTests(APITestCase):
         response = self.client.post(url, data, format='json')
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertTrue('token' in response.data)
-        self.assertTrue(isinstance(response.data['token']['key'], str))
+        self.assertTrue('key' in response.data)
+        self.assertTrue(isinstance(response.data['key'], str))
 
         user = User.objects.first()
-        token_key = response.data['token']['key']
+        token_key = response.data['key']
         token = Token.objects.get(key=token_key)
         self.assertEqual(token.user, user)
 
