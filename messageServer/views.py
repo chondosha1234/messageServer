@@ -114,7 +114,7 @@ def get_group_list(request):
         groups = user.groups
         serializer = GroupSerializer(groups, many=True)
         response_data = {
-            'groups': [serializer.data]
+            'groups': serializer.data
         }
         return Response(response_data, status=status.HTTP_200_OK)
     except User.DoesnotExist:
