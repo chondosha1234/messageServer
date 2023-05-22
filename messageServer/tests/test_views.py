@@ -248,6 +248,22 @@ class GroupTests(APITestCase):
         self.assertEqual(Group.objects.count(), 1)
         self.assertEqual(Group.objects.first().name, 'test group')
 
+    def test_create_group_adds_creator_as_member(self):
+        user = User.objects.create(email="chondosha@example.com", username="chondosha")
+        self.client.force_authenticate(user=user)
+
+        self.assertEqual(Group.objects.count(), 0)
+        data = {
+            'name': 'test group'
+        }
+        url = reverse('create_group')
+        response = self.client.post(url, data=data, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(Group.objects.count(), 1)
+        self.assertEqual(Group.objects.first().members.count(), 1)
+        self.assertEqual(Group.objects.first().members.first().username, 'chondosha')
+
     def test_get_group(self):
         user = User.objects.create(email="chondosha@example.com", username="chondosha")
         self.client.force_authenticate(user=user)

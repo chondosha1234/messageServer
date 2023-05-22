@@ -82,9 +82,11 @@ API views related to Groups
 def create_group(request):
     serializer = GroupSerializer(data=request.data)
     if serializer.is_valid():
-        serializer.save()
+        group = serializer.save()
+        group.members.add(request.user)
+        group.save()
         response_data = {
-            'groups': [serializer.data]
+            'groups': serializer.data
         }
         return Response(response_data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
