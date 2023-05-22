@@ -213,7 +213,7 @@ class FriendsListTests(APITestCase):
         response = self.client.get(url, format='json')
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        response_emails = [friend['email'] for friend in response.data['users'][0]]
+        response_emails = [friend['email'] for friend in response.data['users']]
         self.assertCountEqual(response_emails, [friend1.email, friend2.email])
 
     def test_get_friends_list_returns_empty_list(self):
@@ -226,7 +226,7 @@ class FriendsListTests(APITestCase):
         response = self.client.get(url, format='json')
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['users'][0], [])
+        self.assertEqual(response.data['users'], [])
 
 
 @override_settings(MEDIA_ROOT='media_test')
@@ -288,8 +288,8 @@ class GroupTests(APITestCase):
         response = self.client.get(url, format='json')
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data['groups'][0]), 2)
-        response_group_names = [group['name'] for group in response.data['groups'][0]]
+        self.assertEqual(len(response.data['groups']), 2)
+        response_group_names = [group['name'] for group in response.data['groups']]
         self.assertCountEqual(response_group_names, [group1.name, group2.name])
 
     def test_get_member_list(self):
