@@ -113,14 +113,9 @@ def get_group_list(request):
         user = request.user
         groups = user.groups
         serializer = GroupSerializer(groups, many=True)
-        if len(groups.all()) == 1:
-            response_data = {
-                'groups': [serializer.data]
-            }
-        else:
-            response_data = {
-                'groups': serializer.data
-            }
+        response_data = {
+            'groups': [serializer.data]
+        }
         return Response(response_data, status=status.HTTP_200_OK)
     except User.DoesnotExist:
         return Response({'error': 'User does not exist'}, status=status.HTTP_404_NOT_FOUND)
