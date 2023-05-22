@@ -63,7 +63,7 @@ AUTHENTICATION_BACKENDS = [
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'messageServer.authentication.CustomAuthenticationBackend',
+        #'messageServer.authentication.CustomAuthenticationBackend',
         'rest_framework.authentication.TokenAuthentication',
         'rest_framework.authentication.SessionAuthentication',
     ]
