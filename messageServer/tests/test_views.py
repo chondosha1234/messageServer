@@ -47,10 +47,10 @@ class MessageTests(APITestCase):
         response = self.client.get(url, format='json')
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data['messages'][0]), 2)
+        self.assertEqual(len(response.data['messages']), 2)
         #because of order_by latest message is first,  also the [0][1] is because messages is list and there is ordered dictionary as only element
-        self.assertEqual(response.data['messages'][0][0]['text'], message2.text)
-        self.assertEqual(response.data['messages'][0][1]['text'], message1.text)
+        self.assertEqual(response.data['messages'][0]['text'], message2.text)
+        self.assertEqual(response.data['messages'][1]['text'], message1.text)
 
 
 @override_settings(MEDIA_ROOT='media_test')

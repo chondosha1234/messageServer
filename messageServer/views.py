@@ -56,7 +56,7 @@ def send_message(request):
         messaging.send_multicast(message)
 
         response_data = {
-            'messages': [serializer.data]
+            'messages': serializer.data
         }
         return Response(response_data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -68,7 +68,7 @@ def get_messages(request, conversation_id):
     messages = Message.objects.filter(conversation=conversation_id).order_by('-created_at')
     serializer = MessageSerializer(messages, many=True)
     response_data = {
-        'messages': [serializer.data]
+        'messages': serializer.data
     }
     return Response(response_data, status=status.HTTP_200_OK)
 
