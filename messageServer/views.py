@@ -215,6 +215,7 @@ API views related to Conversations
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_conversation(request):
+    logger.info(f"create conversation request: {request.data}")
     serializer = ConversationSerializer(data=request.data)
     if serializer.is_valid():
         serializer.save()
