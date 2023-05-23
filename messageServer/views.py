@@ -217,7 +217,7 @@ API views related to Conversations
 def create_conversation(request):
     logger.info(f"create conversation request: {request.data}")
     serializer = ConversationSerializer(data=request.data)
-    logger.info(f"convo serializer data: {serializer.data}")
+    logger.info(f"convo serializer data: {serializer.is_valid()}")
     if serializer.is_valid():
         serializer.save()
         response_data = {
