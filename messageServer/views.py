@@ -214,7 +214,7 @@ API views related to Conversations
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
-def create_conversation(request, group_id):
+def create_conversation(request):
     serializer = ConversationSerializer(data=request.data)
     if serializer.is_valid():
         serializer.save()

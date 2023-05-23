@@ -213,7 +213,7 @@ class FriendsListTests(APITestCase):
         response = self.client.get(url, format='json')
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        response_emails = [friend['email'] for friend in response.data['users'][0]]
+        response_emails = [friend['email'] for friend in response.data['users']]
         self.assertCountEqual(response_emails, [friend1.email, friend2.email])
 
     def test_get_friends_list_returns_empty_list(self):
@@ -226,7 +226,7 @@ class FriendsListTests(APITestCase):
         response = self.client.get(url, format='json')
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['users'][0], [])
+        self.assertEqual(response.data['users'], [])
 
 
 @override_settings(MEDIA_ROOT='media_test')
@@ -288,8 +288,8 @@ class GroupTests(APITestCase):
         response = self.client.get(url, format='json')
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data['groups'][0]), 2)
-        response_group_names = [group['name'] for group in response.data['groups'][0]]
+        self.assertEqual(len(response.data['groups']), 2)
+        response_group_names = [group['name'] for group in response.data['groups']]
         self.assertCountEqual(response_group_names, [group1.name, group2.name])
 
     def test_get_member_list(self):
@@ -305,8 +305,8 @@ class GroupTests(APITestCase):
         response = self.client.get(url, format='json')
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data['users'][0]), 2)
-        response_titles = [user['username'] for user in response.data['users'][0]]
+        self.assertEqual(len(response.data['users']), 2)
+        response_titles = [user['username'] for user in response.data['users']]
         self.assertCountEqual(response_titles, [user.username, other_user.username])
 
     def test_add_member(self):
@@ -380,7 +380,7 @@ class ConversationTests(APITestCase):
             'book_title': 'test book',
             'group': group.id
         }
-        url = reverse('create_conversation', args=[group.id])
+        url = reverse('create_conversation')
         response = self.client.post(url, data=data, format='json')
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -413,8 +413,8 @@ class ConversationTests(APITestCase):
         response = self.client.get(url, format='json')
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data['conversations'][0]), 2)
-        response_titles = [conversation['book_title'] for conversation in response.data['conversations'][0]]
+        self.assertEqual(len(response.data['conversations']), 2)
+        response_titles = [conversation['book_title'] for conversation in response.data['conversations']]
         self.assertCountEqual(response_titles, [conversation1.book_title, conversation2.book_title])
 
     def test_set_conversation_picture(self):
