@@ -132,7 +132,7 @@ def get_member_list(request, group_id):
     members = group.members.all()
     serializer = UserSerializer(members, many=True)
     response_data = {
-        'users': [serializer.data]
+        'users': serializer.data
     }
     return Response(response_data, status=status.HTTP_200_OK)
 
