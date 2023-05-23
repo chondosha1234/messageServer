@@ -86,7 +86,7 @@ def create_group(request):
         group.members.add(request.user)
         group.save()
         response_data = {
-            'groups': serializer.data
+            'groups': [serializer.data]
         }
         return Response(response_data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -114,7 +114,7 @@ def get_group_list(request):
         groups = user.groups
         serializer = GroupSerializer(groups, many=True)
         response_data = {
-            'groups': serializer.data
+            'groups': [serializer.data]
         }
         return Response(response_data, status=status.HTTP_200_OK)
     except User.DoesnotExist:
@@ -328,7 +328,7 @@ def get_friends_list(request):
     if friends is not None:
         serializer = UserSerializer(friends, many=True)
         response_data = {
-            'users': serializer.data
+            'users': [serializer.data]
         }
         return Response(response_data, status=status.HTTP_200_OK)
     else:
