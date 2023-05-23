@@ -217,6 +217,7 @@ API views related to Conversations
 def create_conversation(request):
     logger.info(f"create conversation request: {request.data}")
     serializer = ConversationSerializer(data=request.data)
+    logger.info(f"convo serializer data: {serializer.data}")
     if serializer.is_valid():
         serializer.save()
         response_data = {
@@ -323,8 +324,6 @@ def remove_friend(request, user_id):
 def get_friends_list(request):
     user = request.user
     friends = user.friends.all()
-    logger.info(f"In get friends list view friends: {friends}")
-    logger.info(f"Is friends None?: {friends is None}")
 
     if friends is not None:
         serializer = UserSerializer(friends, many=True)
@@ -427,20 +426,16 @@ class LoginView(APIView):
     authentication_classes = []
 
     def post(self, request):
-        logger.info(f'Request in login post: {request.data}')
         serializer = LoginSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
         username = serializer.validated_data['username']
         password = serializer.validated_data['password']
-        logger.info(f'username and password after validated data: {username} and {password}')
 
         user = authenticate(username=username, password=password)
-        logger.info(f'user after authenticate: {user}')
         if user is not None:
             login(request, user)
             token = Token.objects.get(user=user)
-            logger.info(f'token value after login: {token}')
             token_serializer = TokenSerializer(token)
             #user_serializer = UserSerializer(user)
             response_data = {

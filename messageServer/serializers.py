@@ -11,10 +11,8 @@ User = get_user_model()
 
 
 class LoginSerializer(serializers.Serializer):
-    logger.info('inside login serializer')
     username = serializers.CharField()
     password = serializers.CharField()
-    logger.info(f'value of username and password in serializer: {username} and {password}')
 
 
 class TokenSerializer(serializers.ModelSerializer):
@@ -85,6 +83,7 @@ class ConversationSerializer(serializers.ModelSerializer):
 
 
     def create(self, validated_data):
+        logger.info(f"Inside convo serializer create.  validated data: {validated_data}")
         book_title = validated_data.pop('book_title')
         group = validated_data.pop('group')
 
