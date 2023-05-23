@@ -250,7 +250,7 @@ def get_conversation_list(request, group_id):
     conversations = group.conversations.all()
     serializer = ConversationSerializer(conversations, many=True)
     response_data = {
-        'conversations': [serializer.data]
+        'conversations': serializer.data
     }
     return Response(response_data, status=status.HTTP_200_OK)
 
