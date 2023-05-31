@@ -147,6 +147,62 @@ class UserTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['users'][0]['username'], 'chondosha')
 
+    def test_search_user_returns_user(self):
+        user = User.objects.create(email="chondosha@example.com", username="chondosha")
+        self.client.force_authenticate(user=user)
+        other = User.objects.create(email="other@example.com", username="other_guy")
+
+        data = {
+            'query': 'other_guy'
+        }
+        url = reverse('search_users')
+        response = self.client.get(url, data, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['users'][0]['username'], 'other_guy')
+
+    def test_search_does_not_return_current_user(self):
+        user = User.objects.create(email="chondosha@example.com", username="chondosha")
+        self.client.force_authenticate(user=user)
+
+        data = {
+            'query': 'chondosha'
+        }
+        url = reverse('search_users')
+        response = self.client.get(url, data, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data['users']), 0)
+
+    def test_partial_search_returns_user(self):
+        user = User.objects.create(email="chondosha@example.com", username="chondosha")
+        self.client.force_authenticate(user=user)
+        other = User.objects.create(email="other@example.com", username="other_guy")
+
+        data = {
+            'query': 'other'
+        }
+        url = reverse('search_users')
+        response = self.client.get(url, data, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['users'][0]['username'], 'other_guy')
+
+    def test_search_returns_multiple_users(self):
+        user = User.objects.create(email="chondosha@example.com", username="chondosha")
+        self.client.force_authenticate(user=user)
+        other1 = User.objects.create(email="other1@example.com", username="other1_guy")
+        other2 = User.objects.create(email="other2@example.com", username="other2_guy")
+
+        data = {
+            'query': 'other'
+        }
+        url = reverse('search_users')
+        response = self.client.get(url, data, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data['users']), 2)
+
     def test_set_profile_picture(self):
         user = User.objects.create(email="chondosha@example.com", username="chondosha")
         self.client.force_authenticate(user=user)

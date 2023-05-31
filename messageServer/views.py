@@ -369,6 +369,23 @@ def get_user(request, user_id):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
+def search_users(request):
+    query = request.GET.get('query')
+
+    if not query or len(query) < 1:
+        return Response({'error': 'Please provide a valid search query'}, status=status.HTTP_400_BAD_REQUEST)
+
+    users = User.objects.filter(username__icontains=query).exclude(id=request.user.id)
+    serializer = UserSerializer(users, many=True)
+    response_data = {
+        'users': serializer.data
+    }
+
+    return Response(response_data, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def get_current_user(request):
     user = request.user
     if user:
