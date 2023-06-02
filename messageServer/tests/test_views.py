@@ -152,11 +152,8 @@ class UserTests(APITestCase):
         self.client.force_authenticate(user=user)
         other = User.objects.create(email="other@example.com", username="other_guy")
 
-        data = {
-            'query': 'other_guy'
-        }
-        url = reverse('search_users')
-        response = self.client.get(url, data, format='json')
+        url = reverse('search_users', args=['other_guy'])
+        response = self.client.get(url, format='json')
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['users'][0]['username'], 'other_guy')
@@ -165,11 +162,8 @@ class UserTests(APITestCase):
         user = User.objects.create(email="chondosha@example.com", username="chondosha")
         self.client.force_authenticate(user=user)
 
-        data = {
-            'query': 'chondosha'
-        }
-        url = reverse('search_users')
-        response = self.client.get(url, data, format='json')
+        url = reverse('search_users', args=['chondosha'])
+        response = self.client.get(url, format='json')
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data['users']), 0)
@@ -179,11 +173,8 @@ class UserTests(APITestCase):
         self.client.force_authenticate(user=user)
         other = User.objects.create(email="other@example.com", username="other_guy")
 
-        data = {
-            'query': 'other'
-        }
-        url = reverse('search_users')
-        response = self.client.get(url, data, format='json')
+        url = reverse('search_users', args=['other'])
+        response = self.client.get(url, format='json')
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['users'][0]['username'], 'other_guy')
@@ -194,11 +185,8 @@ class UserTests(APITestCase):
         other1 = User.objects.create(email="other1@example.com", username="other1_guy")
         other2 = User.objects.create(email="other2@example.com", username="other2_guy")
 
-        data = {
-            'query': 'other'
-        }
-        url = reverse('search_users')
-        response = self.client.get(url, data, format='json')
+        url = reverse('search_users', args=['other'])
+        response = self.client.get(url, format='json')
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data['users']), 2)

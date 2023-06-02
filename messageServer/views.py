@@ -369,8 +369,8 @@ def get_user(request, user_id):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def search_users(request):
-    query = request.GET.get('query')
+def search_users(request, query):
+    #query = request.GET.get('query')
 
     if not query or len(query) < 1:
         return Response({'error': 'Please provide a valid search query'}, status=status.HTTP_400_BAD_REQUEST)
