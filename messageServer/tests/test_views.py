@@ -154,6 +154,45 @@ class UserTests(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
+    def test_set_fcm_token(self):
+        user = User.objects.create(email="chondosha@example.com", username="chondosha")
+        self.client.force_authenticate(user=user)
+
+        self.assertEqual(user.fcm_registration_token, None)
+
+        data = {
+            'fcm_token': 'sample_token'
+        }
+        url = reverse('set_fcm_token')
+        response = self.client.post(url, data, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(user.fcm_registration_token, 'sample_token')
+
+    def test_clear_fcm_token_on_logout(self):
+        user = User.objects.create(email="chondosha@example.com", username="chondosha")
+        user.fcm_registration_token = 'sample_token'
+        user.set_password('chondosha5563')
+        user.save()
+
+        self.assertEqual(user.fcm_registration_token, 'sample_token')
+
+        data = {
+            'username': 'chondosha',
+            'password': 'chondosha5563'
+        }
+        url = reverse('login')
+        response = self.client.post(url, data, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        self.client.force_authenticate(user=user)
+        url = reverse('logout')
+        response = self.client.post(url, format='json')
+
+        self.assertEqual(user.fcm_registration_token, None)
+
+
     def test_get_current_user(self):
         user = User.objects.create(email="chondosha@example.com", username="chondosha")
         self.client.force_authenticate(user=user)

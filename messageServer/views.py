@@ -425,7 +425,7 @@ def set_profile_picture(request):
 @permission_classes([IsAuthenticated])
 def set_fcm_token(request):
     user = request.user
-    token = request.get('fcm_token')
+    token = request.data.get('fcm_token')
     try:
         user.fcm_registration_token = token
         user.save()
@@ -468,5 +468,8 @@ class LogoutView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
+        user = request.user
+        user.fcm_registration_token = None
+        user.save()
         logout(request)
         return Response({'detail': 'Logged out successfully'})
