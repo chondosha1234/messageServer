@@ -68,8 +68,11 @@ def send_message(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_messages(request, conversation_id):
+    logger.info("start get message view")
     messages = Message.objects.filter(conversation=conversation_id).order_by('-created_at')
+    logger.info(f"messages: {messages}")
     serializer = MessageSerializer(messages, many=True)
+    logger.info(f"serializer: {serializer}")
     response_data = {
         'messages': serializer.data
     }
