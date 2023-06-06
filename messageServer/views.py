@@ -58,7 +58,7 @@ def send_message(request):
         """
 
         response_data = {
-            'messages': serializer.data
+            'messages': [serializer.data]
         }
         return Response(response_data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
