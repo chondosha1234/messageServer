@@ -5,3 +5,4 @@ __pycache__
 *.log
 firebase
 media_test
+messageServer/migrations
