@@ -22,6 +22,7 @@ class MessageTests(APITestCase):
         conversation = Conversation.objects.create(book_title='test conversation', group=group)
         data = {
             'sender': user.id,
+            'sender_username': 'chondosha',
             'conversation': conversation.id,
             'text': 'test message'
         }

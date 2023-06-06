@@ -25,6 +25,7 @@ API views related to messages
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def send_message(request):
+    """
     sender_id = request.data.get('sender')
     try:
         sender = User.objects.get(id=sender_id)
@@ -32,9 +33,10 @@ def send_message(request):
         return Response({'sender': f'User with id {sender_id} does not exist'})
 
     data = request.data.copy()
-    data['sender'] = sender.username
+    data['sender'] = sender
+    """
 
-    serializer = MessageSerializer(data=data)
+    serializer = MessageSerializer(data=request.data)
     if serializer.is_valid():
         serializer.save()
 
@@ -56,7 +58,6 @@ def send_message(request):
         )
         messaging.send_multicast(message)
         """
-
         response_data = {
             'messages': [serializer.data]
         }

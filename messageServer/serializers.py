@@ -52,16 +52,18 @@ class MessageSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Message
-        fields = ['id', 'sender', 'conversation', 'text', 'created_at']
+        fields = ['id', 'sender', 'sender_username', 'conversation', 'text', 'created_at']
         read_only_fields = ['id', 'created_at']
 
     def create(self, validated_data):
         sender = validated_data.pop('sender')
+        sender_username = validated_data.pop('sender_username')
         conversation = validated_data.pop('conversation')
         text = validated_data.pop('text')
 
         message = Message.objects.create(
             sender=sender,
+            sender_username=sender_username,
             conversation=conversation,
             text=text
         )
