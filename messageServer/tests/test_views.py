@@ -31,6 +31,7 @@ class MessageTests(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(Message.objects.count(), 1)
+        self.assertEqual(Message.objects.get().sender.username, 'chondosha')
         self.assertEqual(Message.objects.get().text, 'test message')
         self.assertEqual(Message.objects.get().conversation, conversation)
 

@@ -32,7 +32,7 @@ def send_message(request):
         return Response({'sender': f'User with id {sender_id} does not exist'})
 
     data = request.data.copy()
-    data['sender'] = sender
+    data['sender'] = sender.username
 
     serializer = MessageSerializer(data=request.data)
     if serializer.is_valid():
