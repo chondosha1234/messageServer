@@ -34,7 +34,7 @@ def send_message(request):
     data = request.data.copy()
     data['sender'] = sender.username
 
-    serializer = MessageSerializer(data=request.data)
+    serializer = MessageSerializer(data=data)
     if serializer.is_valid():
         serializer.save()
 
