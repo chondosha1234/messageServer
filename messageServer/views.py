@@ -47,6 +47,11 @@ def send_message(request):
         logger.info(f"conversation: {conversation}")
         members = conversation.group.members.all()
         logger.info(f"members: {members}")
+        
+        member1 = members.first()
+        print(member1)
+        logger.info(f"fcm token of {member1}: {member1.fcm_registration_token}")
+
         registration_tokens = [member.fcm_registration_token for member in members]
         logger.info(f"tokens: {registration_tokens}")
 
@@ -71,11 +76,8 @@ def send_message(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_messages(request, conversation_id):
-    logger.info("start get message view")
     messages = Message.objects.filter(conversation=conversation_id).order_by('-created_at')
-    logger.info(f"messages: {messages}")
     serializer = MessageSerializer(messages, many=True)
-    logger.info(f"serializer: {serializer}")
     response_data = {
         'messages': serializer.data
     }
@@ -224,9 +226,7 @@ API views related to Conversations
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_conversation(request):
-    logger.info(f"create conversation request: {request.data}")
     serializer = ConversationSerializer(data=request.data)
-    logger.info(f"convo serializer data: {serializer.is_valid()}")
     if serializer.is_valid():
         serializer.save()
         response_data = {
@@ -435,6 +435,7 @@ def set_profile_picture(request):
 def set_fcm_token(request):
     user = request.user
     token = request.data.get('fcm_token')
+    logger.info(f"fcm token: {token}")
     try:
         user.fcm_registration_token = token
         user.save()
@@ -442,6 +443,7 @@ def set_fcm_token(request):
         response_data = {
             'users': [serializer.data]
         }
+        logger.info(f"user after setting: {user.fcm_registration_token}")
         return Response(response_data, status=status.HTTP_200_OK)
     except User.DoesNotExist:
         return Response({'error': 'User does not exist'}, status=status.HTTP_404_NOT_FOUND)
