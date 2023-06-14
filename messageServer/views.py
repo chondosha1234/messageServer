@@ -40,12 +40,15 @@ def send_message(request):
     if serializer.is_valid():
         serializer.save()
 
-        """
         #Send FCM notifications to all members of group
         conversation_id = request.data.get('conversation')
+        logger.info(f"conversation id: {conversation_id}")
         conversation = Conversation.objects.get(id=conversation_id)
+        logger.info(f"conversation: {conversation}")
         members = conversation.group.members.all()
+        logger.info(f"members: {members}")
         registration_tokens = [member.fcm_registration_token for member in members]
+        logger.info(f"tokens: {registration_tokens}")
 
         title = "New Message(s)"
         body = f"You have new messages!"
@@ -57,7 +60,7 @@ def send_message(request):
             tokens=registration_tokens
         )
         messaging.send_multicast(message)
-        """
+
         response_data = {
             'messages': [serializer.data]
         }
