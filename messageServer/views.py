@@ -47,7 +47,7 @@ def send_message(request):
         logger.info(f"conversation: {conversation}")
         members = conversation.group.members.all()
         logger.info(f"members: {members}")
-        
+
         member1 = members.first()
         print(member1)
         logger.info(f"fcm token of {member1}: {member1.fcm_registration_token}")
@@ -479,8 +479,5 @@ class LogoutView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        user = request.user
-        user.fcm_registration_token = None
-        user.save()
         logout(request)
         return Response({'detail': 'Logged out successfully'})

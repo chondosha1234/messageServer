@@ -171,6 +171,7 @@ class UserTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(user.fcm_registration_token, 'sample_token')
 
+    """
     def test_clear_fcm_token_on_logout(self):
         user = User.objects.create(email="chondosha@example.com", username="chondosha")
         user.fcm_registration_token = 'sample_token'
@@ -193,7 +194,7 @@ class UserTests(APITestCase):
         response = self.client.post(url, format='json')
 
         self.assertEqual(user.fcm_registration_token, None)
-
+    """
 
     def test_get_current_user(self):
         user = User.objects.create(email="chondosha@example.com", username="chondosha")
