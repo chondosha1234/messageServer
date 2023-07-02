@@ -27,7 +27,7 @@ class GroupSerializer(serializers.ModelSerializer):
 
     def get_picture_url(self, group):
         if group.picture:
-            return settings.SITE_URL + group.picture.url
+            return "http://" + settings.SITE_URL + group.picture.url
         return None
 
     class Meta:
@@ -76,7 +76,7 @@ class ConversationSerializer(serializers.ModelSerializer):
 
     def get_picture_url(self, conversation):
         if conversation.picture:
-            return settings.SITE_URL + conversation.picture.url
+            return "http://" + settings.SITE_URL + conversation.picture.url
         return None
 
     class Meta:
