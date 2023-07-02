@@ -40,7 +40,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     def get_picture_url(self, user):
         if user.picture:
-            return settings.SITE_URL + user.picture.url
+            return "http://" + settings.SITE_URL + user.picture.url
         return None
 
     class Meta:

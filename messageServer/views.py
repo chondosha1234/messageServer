@@ -426,7 +426,7 @@ def set_profile_picture(request):
 def set_fcm_token(request):
     user = request.user
     token = request.data.get('fcm_token')
-    logger.info(f"fcm token: {token}")
+    #logger.info(f"fcm token: {token}")
     try:
         user.fcm_registration_token = token
         user.save()
@@ -434,7 +434,7 @@ def set_fcm_token(request):
         response_data = {
             'users': [serializer.data]
         }
-        logger.info(f"user after setting: {user.fcm_registration_token}")
+        #logger.info(f"user after setting: {user.fcm_registration_token}")
         return Response(response_data, status=status.HTTP_200_OK)
     except User.DoesNotExist:
         return Response({'error': 'User does not exist'}, status=status.HTTP_404_NOT_FOUND)
