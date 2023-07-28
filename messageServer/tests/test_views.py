@@ -461,9 +461,10 @@ class GroupTests(APITestCase):
             image_data = image_file.read()
         base64_image = base64.b64encode(image_data).decode('utf-8')
         data = {
+            'groupId': group.id,
             'picture': base64_image
         }
-        url = reverse('set_group_picture', args=[group.id])
+        url = reverse('set_group_picture')
         response = self.client.post(url, data, format='json')
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -533,9 +534,10 @@ class ConversationTests(APITestCase):
             image_data = image_file.read()
         base64_image = base64.b64encode(image_data).decode('utf-8')
         data = {
+            'conversationId': conversation.id,
             'picture': base64_image
         }
-        url = reverse('set_conversation_picture', args=[conversation.id])
+        url = reverse('set_conversation_picture')
         response = self.client.post(url, data, format='json')
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)

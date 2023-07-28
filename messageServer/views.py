@@ -141,8 +141,9 @@ def get_member_list(request, group_id):
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
-def set_group_picture(request, group_id):
+def set_group_picture(request):
     try:
+        group_id = request.data.get('groupId')
         group = Group.objects.get(id=group_id)
     except Group.DoesNotExist:
         return Response({'error': 'Group does not exist'}, status=status.HTTP_404_NOT_FOUND)
@@ -259,8 +260,9 @@ def get_conversation_list(request, group_id):
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
-def set_conversation_picture(request, conversation_id):
+def set_conversation_picture(request):
     try:
+        conversation_id = request.data.get('conversationId')
         conversation = Conversation.objects.get(id=conversation_id)
     except Conversation.DoesNotExist:
         return Response({'error': 'Conversation does not exist'}, status=status.HTTP_404_NOT_FOUND)
